@@ -15,18 +15,18 @@ class TestFrontendServing(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/html", response.headers.get("content-type", ""))
         self.assertIn("AUDITVECTOR", response.text)
-        self.assertIn("5-Agent ADK Orchestration Stream", response.text)
+        self.assertIn("ADK MULTI-AGENT PIPELINE", response.text)
 
     def test_serve_static_css(self):
         response = self.client.get("/static/styles.css")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("AuditVector", response.text)
-        self.assertIn("--bg-primary", response.text)
+        self.assertIn("AUDITVECTOR", response.text.upper())
+        self.assertIn("--bg-base", response.text)
 
     def test_serve_static_javascript(self):
         response = self.client.get("/static/app.js")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("AuditVector", response.text)
+        self.assertIn("AUDITVECTOR", response.text.upper())
         self.assertIn("DOMContentLoaded", response.text)
 
 

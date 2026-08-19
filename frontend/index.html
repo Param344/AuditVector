@@ -7,238 +7,679 @@
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="dark-theme">
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-container">
-            <div class="brand">
-                <div class="logo-shield">
-                    <span class="logo-icon">🛡️</span>
+<body class="forensic-theme">
+    <!-- TOP COMMAND BAR -->
+    <header class="command-bar">
+        <div class="command-bar-inner">
+            <div class="brand-group">
+                <div class="brand-badge">
+                    <span class="brand-glyph">🛡️</span>
                 </div>
-                <div>
-                    <h1 class="logo-title">AUDITVECTOR</h1>
-                    <span class="logo-tagline">AI reasons. Code proves. Evidence explains.</span>
+                <div class="brand-text">
+                    <div class="brand-name">AUDITVECTOR <span class="brand-subname">FORENSIC SUITE</span></div>
+                    <div class="brand-motto">AI REASONS. CODE PROVES. EVIDENCE EXPLAINS.</div>
                 </div>
             </div>
-            <div class="header-status">
-                <div class="badge badge-adk">
-                    <span class="dot live"></span> Google ADK 2.7
+
+            <div class="system-telemetry">
+                <div class="telemetry-pill live-pill" title="System Runtime Status">
+                    <span class="pulse-indicator"></span>
+                    <span class="telemetry-label">SYSTEM OPERATIONAL</span>
                 </div>
-                <div class="badge badge-gemini">
-                    <span class="dot live"></span> Gemini 3.5 Flash
+                <div class="tech-stack-group">
+                    <span class="tech-tag" title="Google Agent Development Kit 2.7">ADK 2.7</span>
+                    <span class="tech-tag" title="Gemini 3.5 Flash Model Reasoning">Gemini 3.5 Flash</span>
+                    <span class="tech-tag" title="DuckDB Deterministic SQL Engine">DuckDB</span>
+                    <span class="tech-tag" title="Google Cloud Run Microservices">Cloud Run</span>
+                    <span class="tech-tag" title="Google Cloud Pub/Sub Job Dispatch">Pub/Sub</span>
+                    <span class="tech-tag" title="Google Cloud Firestore State Persistence">Firestore</span>
                 </div>
-                <div class="badge badge-duckdb">
-                    <span class="dot live"></span> DuckDB SQL
-                </div>
-                <div class="badge badge-gcp">
-                    <span class="dot live"></span> Cloud Run & Pub/Sub
-                </div>
+            </div>
+
+            <div class="command-actions">
+                <button id="btn-header-new-audit" class="btn-ghost-sm" style="display: none;">
+                    <span>+ New Audit</span>
+                </button>
+                <div id="runtime-status-tag" class="runtime-tag">RUNTIME: LOCAL</div>
             </div>
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="main-container">
-        <!-- Control Bar -->
-        <section class="control-panel">
-            <div class="panel-header">
-                <div>
-                    <h2>🎯 Autonomous Audit Controller</h2>
-                    <p class="panel-sub">Autonomous multi-agent investigation of financial software, backtesters, and execution logs.</p>
+    <!-- MAIN INVESTIGATION WORKSPACE WRAPPER -->
+    <main class="workspace-viewport">
+
+        <!-- ============================================================ -->
+        <!-- SCREEN 1: LAUNCHPAD / AUDIT CONTROLLER                       -->
+        <!-- ============================================================ -->
+        <section id="screen-launchpad" class="screen-view active-screen">
+            <div class="launchpad-hero">
+                <div class="hero-tag">TASKMASTER TRACK • AUTONOMOUS FORENSIC INVESTIGATOR</div>
+                <h1 class="hero-title">Challenge the Financial System's Own Claims.</h1>
+                <p class="hero-desc">
+                    Quantitative trading strategies and execution backtesters silently decay through sign inversions, 
+                    double-counted fees, and drift. AuditVector orchestrates <strong>5 Google ADK agents</strong> to autonomously 
+                    trace financial logic, reconstruct calculations from raw transaction events using <strong>deterministic FIFO lot matching</strong>, 
+                    and seal cryptographically-grounded <strong>Evidence Contracts</strong>.
+                </p>
+            </div>
+
+            <div class="benchmark-grid">
+                <!-- Card 1: IntegrityLab Alpha -->
+                <div class="benchmark-card card-danger" id="card-launch-alpha">
+                    <div class="card-badge-row">
+                        <span class="benchmark-chip chip-danger">FAILURE BENCHMARK</span>
+                        <span class="badge-sub">4 Planted Contradictions</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>IntegrityLab Alpha</h3>
+                        <p>Synthetic multi-strategy backtester containing 4 silent integrity flaws: PnL inversion, disguised return polarity, fee double-deduction, and configuration model drift.</p>
+                        <div class="card-meta-list">
+                            <div class="meta-item"><span>Target Code:</span> <code>strategy_alpha.py</code></div>
+                            <div class="meta-item"><span>Dataset:</span> <code>trades_alpha_failure.csv</code></div>
+                            <div class="meta-item"><span>Expected:</span> <strong>4 Contradictions Confirmed</strong></div>
+                        </div>
+                    </div>
+                    <button id="btn-launch-alpha" class="btn-action btn-action-danger">
+                        <span>START AUDIT</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
                 </div>
-                <div class="demo-buttons">
-                    <button id="btn-demo-alpha" class="btn btn-danger">
-                        <span>⚠️ IntegrityLab Alpha</span>
-                        <small>4 Planted Contradictions</small>
+
+                <!-- Card 2: IntegrityLab Control -->
+                <div class="benchmark-card card-success" id="card-launch-control">
+                    <div class="card-badge-row">
+                        <span class="benchmark-chip chip-success">CONTROL BENCHMARK</span>
+                        <span class="badge-sub">Zero Fabrication Verification</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>IntegrityLab Control</h3>
+                        <p>Mathematically sound quantitative baseline testing that AuditVector proves clean calculations without hallucinating or manufacturing false contradictions.</p>
+                        <div class="card-meta-list">
+                            <div class="meta-item"><span>Target Code:</span> <code>control_strategy.py</code></div>
+                            <div class="meta-item"><span>Dataset:</span> <code>trades_control_case.csv</code></div>
+                            <div class="meta-item"><span>Expected:</span> <strong>100% Mathematical Truth</strong></div>
+                        </div>
+                    </div>
+                    <button id="btn-launch-control" class="btn-action btn-action-success">
+                        <span>START AUDIT</span>
+                        <span class="btn-arrow">→</span>
                     </button>
-                    <button id="btn-demo-control" class="btn btn-success">
-                        <span>✅ IntegrityLab Control</span>
-                        <small>Clean Mathematical Truth</small>
-                    </button>
-                    <button id="btn-demo-aibip" class="btn btn-warning">
-                        <span>⚡ Real AI-BIP Dogfood</span>
-                        <small>Quant Backtester Drift</small>
+                </div>
+
+                <!-- Card 3: AI-BIP Real Dogfood -->
+                <div class="benchmark-card card-warning" id="card-launch-aibip">
+                    <div class="card-badge-row">
+                        <span class="benchmark-chip chip-warning">REAL-WORLD DOGFOOD</span>
+                        <span class="badge-sub">Production Quant Backtester</span>
+                    </div>
+                    <div class="card-content">
+                        <h3>AI-BIP Quantitative Engine</h3>
+                        <p>Real-world quantitative momentum engine operating across BTC, ETH, SOL, and AVAX. Surfaces $16,286 unaccounted execution slippage drag and valuation mismatch.</p>
+                        <div class="card-meta-list">
+                            <div class="meta-item"><span>Target Code:</span> <code>backtest_engine.py</code></div>
+                            <div class="meta-item"><span>Dataset:</span> <code>trades_aibip_real.csv</code></div>
+                            <div class="meta-item"><span>Expected:</span> <strong>Slippage Contradiction</strong></div>
+                        </div>
+                    </div>
+                    <button id="btn-launch-aibip" class="btn-action btn-action-warning">
+                        <span>START AUDIT</span>
+                        <span class="btn-arrow">→</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Custom Audit Configuration Accordion -->
-            <details class="custom-config-details">
-                <summary>⚙️ Custom Repository & Data Input</summary>
-                <div class="config-grid">
-                    <div class="input-group">
-                        <label for="input-project">Project Name</label>
-                        <input type="text" id="input-project" value="Custom-Quant-Strategy" placeholder="Project Name">
+            <!-- Custom Audit Collapsible Console -->
+            <div class="custom-audit-drawer">
+                <details class="custom-details">
+                    <summary class="custom-summary">
+                        <span>⚙️ Configure Custom Target Repository & Transaction Dataset</span>
+                        <span class="details-chevron">▼</span>
+                    </summary>
+                    <div class="custom-form-grid">
+                        <div class="field-group">
+                            <label for="custom-proj-name">Target Project Name</label>
+                            <input type="text" id="custom-proj-name" value="Custom-Quant-Portfolio" placeholder="e.g. Proprietary-Backtester-v1">
+                        </div>
+                        <div class="field-group">
+                            <label for="custom-repo-path">Repository Source Path</label>
+                            <input type="text" id="custom-repo-path" value="integritylab/source" placeholder="Path to Python codebase">
+                        </div>
+                        <div class="field-group">
+                            <label for="custom-data-file">Trade Execution Log CSV</label>
+                            <input type="text" id="custom-data-file" value="integritylab/data/trades_alpha_failure.csv" placeholder="Path to trade CSV">
+                        </div>
+                        <div class="field-group">
+                            <label for="custom-report-file">Reported Summary JSON</label>
+                            <input type="text" id="custom-report-file" value="integritylab/reports/alpha_performance_report.json" placeholder="Path to report JSON">
+                        </div>
+                        <div class="field-group full-width">
+                            <button id="btn-launch-custom" class="btn-action btn-action-primary">
+                                <span>START AUTONOMOUS AUDIT</span>
+                                <span class="btn-arrow">→</span>
+                            </button>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="input-repo">Repository Path</label>
-                        <input type="text" id="input-repo" value="integritylab/source" placeholder="Path to code repo">
-                    </div>
-                    <div class="input-group">
-                        <label for="input-data">Trade Data CSV</label>
-                        <input type="text" id="input-data" value="integritylab/data/trades_alpha_failure.csv" placeholder="Path to trade CSV">
-                    </div>
-                    <div class="input-group">
-                        <label for="input-report">Report JSON</label>
-                        <input type="text" id="input-report" value="integritylab/reports/alpha_performance_report.json" placeholder="Path to report JSON">
-                    </div>
-                    <div class="input-group full-width">
-                        <button id="btn-run-custom" class="btn btn-primary">🚀 Launch Autonomous Multi-Agent Investigation</button>
-                    </div>
-                </div>
-            </details>
+                </details>
+            </div>
         </section>
 
-        <!-- Live Agent Execution Tracker -->
-        <section id="agent-tracker" class="agent-tracker hidden">
-            <div class="tracker-header">
-                <div>
-                    <h3>🤖 5-Agent ADK Orchestration Stream</h3>
-                    <span id="tracker-audit-id" class="audit-id-badge">Audit: Initializing...</span>
-                </div>
-                <div class="spinner"></div>
-            </div>
-            <div class="progress-bar-container">
-                <div id="audit-progress-bar" class="progress-bar" style="width: 0%;"></div>
-            </div>
-            <div class="agent-stages-grid">
-                <div id="stage-planner" class="stage-card">
-                    <div class="stage-icon">1</div>
-                    <div class="stage-info">
-                        <strong>Audit Planner</strong>
-                        <span class="stage-desc">Scoping & Pathways</span>
-                        <span class="stage-status">Idle</span>
+
+        <!-- ============================================================ -->
+        <!-- SCREEN 2: LIVE INVESTIGATION WORKSPACE (3-COLUMN COMMAND VIEW) -->
+        <!-- ============================================================ -->
+        <section id="screen-investigation" class="screen-view hidden-screen">
+            <div class="investigation-header">
+                <div class="investigation-title-block">
+                    <div class="investigation-badge">
+                        <span class="pulse-indicator pulse-blue"></span>
+                        <span>AUTONOMOUS INVESTIGATION IN PROGRESS</span>
                     </div>
+                    <h2 id="live-project-name" class="live-title">Target: IntegrityLab-Alpha</h2>
+                    <span id="live-audit-id" class="live-job-id">JOB: audit-init</span>
                 </div>
-                <div id="stage-repo" class="stage-card">
-                    <div class="stage-icon">2</div>
-                    <div class="stage-info">
-                        <strong>Repo Investigator</strong>
-                        <span class="stage-desc">AST Code Mapping</span>
-                        <span class="stage-status">Idle</span>
+                <div class="overall-progress-box">
+                    <div class="progress-meta">
+                        <span>INVESTIGATION PIPELINE PROGRESS</span>
+                        <strong id="live-progress-pct">0%</strong>
                     </div>
-                </div>
-                <div id="stage-fin" class="stage-card">
-                    <div class="stage-icon">3</div>
-                    <div class="stage-info">
-                        <strong>Financial Investigator</strong>
-                        <span class="stage-desc">Claim Targets</span>
-                        <span class="stage-status">Idle</span>
-                    </div>
-                </div>
-                <div id="stage-contra" class="stage-card">
-                    <div class="stage-icon">4</div>
-                    <div class="stage-info">
-                        <strong>Contradiction Investigator</strong>
-                        <span class="stage-desc">Deterministic Proof</span>
-                        <span class="stage-status">Idle</span>
-                    </div>
-                </div>
-                <div id="stage-report" class="stage-card">
-                    <div class="stage-icon">5</div>
-                    <div class="stage-info">
-                        <strong>Report Agent</strong>
-                        <span class="stage-desc">Executive Synthesis</span>
-                        <span class="stage-status">Idle</span>
+                    <div class="progress-track">
+                        <div id="live-progress-bar" class="progress-fill" style="width: 0%;"></div>
                     </div>
                 </div>
             </div>
-            <div class="logs-console">
-                <div class="console-title">Live Telemetry & Stage Logs:</div>
-                <pre id="console-output"></pre>
+
+            <!-- 3-Column Command Layout -->
+            <div class="investigation-grid">
+                <!-- Column 1: Vertical 5-Agent ADK Pipeline -->
+                <aside class="col-agent-pipeline">
+                    <div class="col-panel-header">
+                        <span class="col-panel-title">01 / ADK MULTI-AGENT PIPELINE</span>
+                    </div>
+                    <div class="agent-stepper">
+                        <!-- Agent 1 -->
+                        <div id="card-agent-planner" class="agent-step-card">
+                            <div class="agent-step-num">01</div>
+                            <div class="agent-step-body">
+                                <div class="agent-name-row">
+                                    <strong>AUDIT PLANNER</strong>
+                                    <span class="agent-badge status-queued">QUEUED</span>
+                                </div>
+                                <div class="agent-op-desc">Formulating investigation pathways</div>
+                                <div class="agent-telemetry-row">
+                                    <span class="tool-tag">scan_repository_ast</span>
+                                    <span class="agent-timer">0.0s</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent 2 -->
+                        <div id="card-agent-repo" class="agent-step-card">
+                            <div class="agent-step-num">02</div>
+                            <div class="agent-step-body">
+                                <div class="agent-name-row">
+                                    <strong>REPO INVESTIGATOR</strong>
+                                    <span class="agent-badge status-queued">QUEUED</span>
+                                </div>
+                                <div class="agent-op-desc">AST calculation pathway mapping</div>
+                                <div class="agent-telemetry-row">
+                                    <span class="tool-tag">ast_keyword_parser</span>
+                                    <span class="agent-timer">0.0s</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent 3 -->
+                        <div id="card-agent-fin" class="agent-step-card">
+                            <div class="agent-step-num">03</div>
+                            <div class="agent-step-body">
+                                <div class="agent-name-row">
+                                    <strong>FINANCIAL INVESTIGATOR</strong>
+                                    <span class="agent-badge status-queued">QUEUED</span>
+                                </div>
+                                <div class="agent-op-desc">Extracting reported financial targets</div>
+                                <div class="agent-telemetry-row">
+                                    <span class="tool-tag">load_normalized_trades</span>
+                                    <span class="agent-timer">0.0s</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent 4 -->
+                        <div id="card-agent-contra" class="agent-step-card">
+                            <div class="agent-step-num">04</div>
+                            <div class="agent-step-body">
+                                <div class="agent-name-row">
+                                    <strong>CONTRADICTION INVESTIGATOR</strong>
+                                    <span class="agent-badge status-queued">QUEUED</span>
+                                </div>
+                                <div class="agent-op-desc">Executing deterministic verification</div>
+                                <div class="agent-telemetry-row">
+                                    <span class="tool-tag">execute_reconciliation</span>
+                                    <span class="agent-timer">0.0s</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agent 5 -->
+                        <div id="card-agent-report" class="agent-step-card">
+                            <div class="agent-step-num">05</div>
+                            <div class="agent-step-body">
+                                <div class="agent-name-row">
+                                    <strong>REPORT AGENT</strong>
+                                    <span class="agent-badge status-queued">QUEUED</span>
+                                </div>
+                                <div class="agent-op-desc">Synthesizing executive report & contracts</div>
+                                <div class="agent-telemetry-row">
+                                    <span class="tool-tag">evidence_contract_seal</span>
+                                    <span class="agent-timer">0.0s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Column 2: Investigation Activity & Live Telemetry Stream -->
+                <main class="col-activity-stream">
+                    <div class="col-panel-header">
+                        <span class="col-panel-title">02 / ACTIVE INVESTIGATION TELEMETRY</span>
+                        <span class="telemetry-live-dot">LIVE STREAM</span>
+                    </div>
+
+                    <div class="current-op-banner">
+                        <span class="op-label">CURRENT OPERATION</span>
+                        <div id="current-operation-text" class="op-headline">Initializing Google ADK Multi-Agent Session...</div>
+                    </div>
+
+                    <div class="telemetry-console-box">
+                        <div class="console-head">
+                            <span>FORENSIC EVENT STREAM</span>
+                            <span id="telemetry-event-count">0 Events Logged</span>
+                        </div>
+                        <div id="telemetry-log-stream" class="telemetry-stream">
+                            <div class="stream-entry">
+                                <span class="entry-time">[00:00:00]</span>
+                                <span class="entry-stage">[INIT]</span>
+                                <span class="entry-msg">AuditVector asynchronous worker initialized.</span>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Column 3: Audit State & Discrepancy Snapshot -->
+                <aside class="col-audit-snapshot">
+                    <div class="col-panel-header">
+                        <span class="col-panel-title">03 / REAL-TIME METRIC RESOLUTION</span>
+                    </div>
+
+                    <div class="snapshot-card-stack">
+                        <div class="snapshot-block">
+                            <span class="snapshot-label">CAPITAL AT RISK / VARIANCE</span>
+                            <div id="live-capital-discrepancy" class="snapshot-val val-danger">$0.00</div>
+                            <small class="snapshot-sub">Unreconciled balance discrepancy</small>
+                        </div>
+
+                        <div class="snapshot-findings-mini">
+                            <div class="mini-finding-row">
+                                <span>Critical Contradictions</span>
+                                <strong id="live-count-critical" class="count-crit">0</strong>
+                            </div>
+                            <div class="mini-finding-row">
+                                <span>High Contradictions</span>
+                                <strong id="live-count-high" class="count-high">0</strong>
+                            </div>
+                            <div class="mini-finding-row">
+                                <span>Config / Model Warnings</span>
+                                <strong id="live-count-medium" class="count-med">0</strong>
+                            </div>
+                            <div class="mini-finding-row">
+                                <span>Verified Sound Calculations</span>
+                                <strong id="live-count-low" class="count-low">0</strong>
+                            </div>
+                        </div>
+
+                        <div class="snapshot-tech-box">
+                            <span class="tech-box-title">DETERMINISTIC VERIFICATION</span>
+                            <div class="tech-feature-item">
+                                <span class="feature-bullet">✓</span>
+                                <span>FIFO Bottom-Up Lot Matching</span>
+                            </div>
+                            <div class="tech-feature-item">
+                                <span class="feature-bullet">✓</span>
+                                <span>Fee Deduction Double-Count Detector</span>
+                            </div>
+                            <div class="tech-feature-item">
+                                <span class="feature-bullet">✓</span>
+                                <span>Polarity & Sign Contradiction Checker</span>
+                            </div>
+                            <div class="tech-feature-item">
+                                <span class="feature-bullet">✓</span>
+                                <span>Evidence Contract Cryptographic Hash</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </section>
 
-        <!-- Audit Results Workspace -->
-        <section id="results-workspace" class="results-workspace hidden">
+
+        <!-- ============================================================ -->
+        <!-- SCREEN 3: FINAL AUDIT VERDICT & FORENSIC WORKSPACE          -->
+        <!-- ============================================================ -->
+        <section id="screen-verdict" class="screen-view hidden-screen">
             <!-- Verdict Banner -->
-            <div id="verdict-banner" class="verdict-banner">
-                <div class="verdict-title-area">
-                    <span id="verdict-icon" class="verdict-icon"></span>
-                    <div>
-                        <h2 id="verdict-text"></h2>
-                        <p id="verdict-desc"></p>
+            <div id="verdict-banner-card" class="verdict-banner-card banner-danger">
+                <div class="verdict-primary-col">
+                    <div class="verdict-header-row">
+                        <span id="verdict-badge-icon" class="verdict-status-icon">⚠️</span>
+                        <div>
+                            <span class="verdict-kicker">AUDITVECTOR FORENSIC VERDICT</span>
+                            <h2 id="verdict-headline" class="verdict-main-text">CONTRADICTION DETECTED</h2>
+                        </div>
                     </div>
+                    <p id="verdict-summary-text" class="verdict-desc-text">
+                        AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.
+                    </p>
                 </div>
-                <div class="capital-discrepancy-card">
-                    <span>Capital at Risk / Discrepancy</span>
-                    <strong id="capital-discrepancy">$0.00</strong>
+                <div class="verdict-stat-col">
+                    <div class="stat-discrepancy-card">
+                        <span class="stat-kicker">TOTAL CAPITAL DISCREPANCY</span>
+                        <strong id="final-capital-discrepancy" class="stat-number-crit">$44,140.00</strong>
+                        <span id="final-audit-duration" class="stat-sub">Audited in 0.18s • 0 False Positives</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Severity Metric Cards -->
-            <div class="metrics-grid">
-                <div class="metric-card critical">
-                    <span class="count" id="count-critical">0</span>
-                    <span class="label">Critical Contradictions</span>
+            <!-- CLAIM VS DETERMINISTIC REALITY HERO COMPARISON -->
+            <div class="claim-reality-hero">
+                <div class="hero-panel-title">
+                    <span>FINANCIAL CLAIM VS. DETERMINISTIC REALITY</span>
+                    <span class="hero-panel-tag">GROUNDED PROOF</span>
                 </div>
-                <div class="metric-card high">
-                    <span class="count" id="count-high">0</span>
-                    <span class="label">High Contradictions</span>
-                </div>
-                <div class="metric-card medium">
-                    <span class="count" id="count-medium">0</span>
-                    <span class="label">Warnings / Config Mismatches</span>
-                </div>
-                <div class="metric-card low">
-                    <span class="count" id="count-low">0</span>
-                    <span class="label">Verified Sound Claims</span>
+
+                <div class="comparison-triplet">
+                    <!-- Column 1: Software's Claim -->
+                    <div class="comparison-card card-claimed">
+                        <div class="comp-card-header">
+                            <span class="comp-label">SOFTWARE'S REPORTED CLAIM</span>
+                            <span class="comp-source-tag" id="claim-source-name">report.json</span>
+                        </div>
+                        <div class="comp-metric-body">
+                            <span class="comp-metric-label">Reported Net Realized PnL</span>
+                            <strong id="claimed-pnl-val" class="comp-val-claim">+$18,240.00</strong>
+                            <div class="comp-metric-sub">
+                                <span>Reported Return:</span>
+                                <strong id="claimed-return-val">+18.24%</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: The Mathematical Delta -->
+                    <div class="comparison-delta-card">
+                        <span class="delta-label">MATHEMATICAL VARIANCE</span>
+                        <div id="variance-delta-val" class="delta-number">-$21,960.00</div>
+                        <div class="delta-desc">Capital Misstatement Discovered</div>
+                        <div class="delta-badge status-contradiction">CRITICAL CONTRADICTION</div>
+                    </div>
+
+                    <!-- Column 3: Deterministic Reality -->
+                    <div class="comparison-card card-reality">
+                        <div class="comp-card-header">
+                            <span class="comp-label">INDEPENDENT DETERMINISTIC PROOF</span>
+                            <span class="comp-source-tag" id="reality-verifier-name">pnl_recalculator_v2.2</span>
+                        </div>
+                        <div class="comp-metric-body">
+                            <span class="comp-metric-label">Bottom-Up FIFO Reconstructed PnL</span>
+                            <strong id="reality-pnl-val" class="comp-val-reality">-$3,720.00</strong>
+                            <div class="comp-metric-sub">
+                                <span>Deterministic Return:</span>
+                                <strong id="reality-return-val">-3.72%</strong>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Tabbed Explorer -->
-            <div class="tabs-container">
-                <div class="tab-buttons">
-                    <button class="tab-btn active" data-tab="tab-findings">🔍 Verified Findings (<span id="findings-tab-count">0</span>)</button>
-                    <button class="tab-btn" data-tab="tab-graph">🕸️ Evidence Graph</button>
-                    <button class="tab-btn" data-tab="tab-report">📄 Executive Markdown Report</button>
-                    <button class="tab-btn" data-tab="tab-duckdb">📊 DuckDB Analytics Profile</button>
-                </div>
-
-                <!-- Tab 1: Findings Explorer -->
-                <div id="tab-findings" class="tab-content active">
-                    <div class="filter-bar">
-                        <span class="filter-label">Filter Findings:</span>
-                        <button class="filter-chip active" data-filter="ALL">All</button>
-                        <button class="filter-chip" data-filter="CRITICAL">🔴 Critical</button>
-                        <button class="filter-chip" data-filter="HIGH">🟠 High</button>
-                        <button class="filter-chip" data-filter="MEDIUM">🟡 Medium</button>
-                        <button class="filter-chip" data-filter="LOW">🟢 Verified</button>
+            <!-- Severity Counters Grid -->
+            <div class="severity-stat-grid">
+                <div class="sev-card sev-critical">
+                    <div class="sev-header">
+                        <span class="sev-dot dot-crit"></span>
+                        <span>CRITICAL CONTRADICTIONS</span>
                     </div>
-                    <div id="findings-container" class="findings-list"></div>
+                    <strong id="summary-crit-count" class="sev-count">2</strong>
+                    <small>Polarity inversions & major PnL discrepancies</small>
                 </div>
 
-                <!-- Tab 2: Evidence Graph -->
-                <div id="tab-graph" class="tab-content">
-                    <div class="graph-header">
-                        <h4>Interactive Provenance Chains: Source Code $\longrightarrow$ Transaction Data $\longrightarrow$ Deterministic Verifier $\longrightarrow$ Verified Contradiction</h4>
-                        <p class="graph-sub">Every finding is anchored by a strict Evidence Contract. Click any chain node for forensic details.</p>
+                <div class="sev-card sev-high">
+                    <div class="sev-header">
+                        <span class="sev-dot dot-high"></span>
+                        <span>HIGH SEVERITY</span>
                     </div>
-                    <div id="evidence-graph-container" class="evidence-graph-view"></div>
+                    <strong id="summary-high-count" class="sev-count">1</strong>
+                    <small>Fee double-counting & aggregation flaws</small>
                 </div>
 
-                <!-- Tab 3: Markdown Report -->
-                <div id="tab-report" class="tab-content">
-                    <div class="report-actions">
-                        <button id="btn-download-bundle" class="btn btn-secondary">📦 Export Evidence Bundle (.json)</button>
-                        <button id="btn-download-report" class="btn btn-secondary">💾 Download .md</button>
-                        <button id="btn-copy-report" class="btn btn-secondary">📋 Copy to Clipboard</button>
+                <div class="sev-card sev-medium">
+                    <div class="sev-header">
+                        <span class="sev-dot dot-med"></span>
+                        <span>CONFIG WARNINGS</span>
                     </div>
-                    <div id="markdown-viewer" class="markdown-viewer"></div>
+                    <strong id="summary-med-count" class="sev-count">1</strong>
+                    <small>Fee rate model parameter mismatches</small>
                 </div>
 
-                <!-- Tab 4: DuckDB Profile -->
-                <div id="tab-duckdb" class="tab-content">
-                    <div id="duckdb-stats-view" class="duckdb-stats-view"></div>
+                <div class="sev-card sev-low">
+                    <div class="sev-header">
+                        <span class="sev-dot dot-low"></span>
+                        <span>VERIFIED SOUND</span>
+                    </div>
+                    <strong id="summary-low-count" class="sev-count">0</strong>
+                    <small>Claims matching deterministic recalculation</small>
+                </div>
+            </div>
+
+            <!-- Forensic Explorer Navigation Tabs -->
+            <div class="forensic-tabs-panel">
+                <div class="tabs-nav-bar">
+                    <button class="nav-tab-btn active" data-target="panel-findings">
+                        <span>🔍 Verified Findings (<span id="tab-findings-badge">0</span>)</span>
+                    </button>
+                    <button class="nav-tab-btn" data-target="panel-graph">
+                        <span>🕸️ Interactive Evidence Graph</span>
+                    </button>
+                    <button class="nav-tab-btn" data-target="panel-timeline">
+                        <span>⏱️ Forensic Audit Timeline</span>
+                    </button>
+                    <button class="nav-tab-btn" data-target="panel-report">
+                        <span>📄 Executive Audit Report</span>
+                    </button>
+                    <button class="nav-tab-btn" data-target="panel-duckdb">
+                        <span>📊 DuckDB SQL Profile</span>
+                    </button>
+                </div>
+
+                <!-- TAB 1: FINDINGS EXPLORER -->
+                <div id="panel-findings" class="tab-view-panel active-tab">
+                    <div class="findings-filter-bar">
+                        <span class="filter-caption">FILTER SEVERITY:</span>
+                        <div class="filter-chips">
+                            <button class="chip-filter active" data-sev="ALL">All Findings</button>
+                            <button class="chip-filter" data-sev="CRITICAL">🔴 Critical</button>
+                            <button class="chip-filter" data-sev="HIGH">🟠 High</button>
+                            <button class="chip-filter" data-sev="MEDIUM">🟡 Medium / Warning</button>
+                            <button class="chip-filter" data-sev="LOW">🟢 Verified Sound</button>
+                        </div>
+                    </div>
+                    <div id="findings-cards-list" class="findings-cards-list"></div>
+                </div>
+
+                <!-- TAB 2: INTERACTIVE EVIDENCE GRAPH -->
+                <div id="panel-graph" class="tab-view-panel">
+                    <div class="graph-intro-bar">
+                        <div>
+                            <h4>CRYPTOGRAPHIC PROVENANCE GRAPH</h4>
+                            <p>Interactive Node-and-Edge Evidence Chains. Click any node to open the Forensic Inspector.</p>
+                        </div>
+                        <div class="graph-legend">
+                            <span class="legend-item"><span class="legend-node node-src"></span> Source Code</span>
+                            <span class="legend-item"><span class="legend-node node-data"></span> Raw Data</span>
+                            <span class="legend-item"><span class="legend-node node-norm"></span> Normalizer</span>
+                            <span class="legend-item"><span class="legend-node node-ver"></span> Deterministic Verifier</span>
+                            <span class="legend-item"><span class="legend-node node-find"></span> Verified Finding</span>
+                        </div>
+                    </div>
+                    <div id="evidence-graph-viewport" class="evidence-graph-viewport"></div>
+                </div>
+
+                <!-- TAB 3: FORENSIC AUDIT TIMELINE -->
+                <div id="panel-timeline" class="tab-view-panel">
+                    <div class="timeline-intro-bar">
+                        <h4>ASYNCHRONOUS AUDIT EXECUTION TIMELINE</h4>
+                        <p>Exact millisecond event log tracing each agent's execution, tool invocation, and verification state.</p>
+                    </div>
+                    <div id="forensic-timeline-list" class="forensic-timeline-list"></div>
+                </div>
+
+                <!-- TAB 4: EXECUTIVE REPORT -->
+                <div id="panel-report" class="tab-view-panel">
+                    <div class="report-toolbar">
+                        <div class="report-toolbar-info">
+                            <strong>EXECUTIVE AUDIT REPORT (.MD)</strong>
+                            <span>Ready for institutional risk and compliance archiving</span>
+                        </div>
+                        <div class="report-toolbar-btns">
+                            <button id="btn-export-bundle" class="btn-report-tool">📦 Export Evidence Bundle (.json)</button>
+                            <button id="btn-download-md" class="btn-report-tool">💾 Download Markdown (.md)</button>
+                            <button id="btn-copy-md" class="btn-report-tool">📋 Copy to Clipboard</button>
+                        </div>
+                    </div>
+                    <div id="markdown-report-container" class="markdown-report-container"></div>
+                </div>
+
+                <!-- TAB 5: DUCKDB PROFILE -->
+                <div id="panel-duckdb" class="tab-view-panel">
+                    <div class="duckdb-profile-card">
+                        <div class="duckdb-header">
+                            <div class="duckdb-logo-row">
+                                <span class="duckdb-icon">🦆</span>
+                                <div>
+                                    <h4>DuckDB In-Memory Analytical Execution</h4>
+                                    <p>High-throughput deterministic SQL execution profile</p>
+                                </div>
+                            </div>
+                            <span class="duckdb-version-tag">DuckDB 1.5.5</span>
+                        </div>
+                        <div id="duckdb-stats-content" class="duckdb-content-grid"></div>
+                    </div>
                 </div>
             </div>
         </section>
+
     </main>
 
-    <footer class="app-footer">
-        <p>AUDITVECTOR — Autonomous Financial Integrity Investigator • Built for All Things Agentic Hackathon (Track: Taskmaster) • Google ADK, Gemini 3.5+, DuckDB, Python & Cloud Run</p>
+    <!-- ============================================================ -->
+    <!-- SLIDE-OUT FORENSIC EVIDENCE INSPECTOR DRAWER                 -->
+    <!-- ============================================================ -->
+    <aside id="inspector-drawer" class="inspector-drawer hidden-drawer">
+        <div class="drawer-header">
+            <div class="drawer-title-group">
+                <span class="drawer-kicker">EVIDENCE CONTRACT INSPECTOR</span>
+                <h3 id="drawer-finding-id">F-001</h3>
+            </div>
+            <button id="btn-close-drawer" class="btn-close-drawer" aria-label="Close Inspector">✕</button>
+        </div>
+
+        <div class="drawer-body">
+            <!-- Status Pill -->
+            <div class="drawer-section">
+                <span class="drawer-section-label">VERDICT CLASSIFICATION</span>
+                <div class="drawer-status-row">
+                    <span id="drawer-status-badge" class="status-badge status-CONTRADICTION">CONTRADICTION</span>
+                    <span id="drawer-severity-badge" class="badge">Severity: CRITICAL</span>
+                    <span id="drawer-confidence-badge" class="badge">Confidence: 95%</span>
+                </div>
+            </div>
+
+            <!-- Finding Title & Explanation -->
+            <div class="drawer-section">
+                <span class="drawer-section-label">INVESTIGATION FINDING</span>
+                <h4 id="drawer-finding-title">PnL Reconciliation Integrity Failure</h4>
+                <p id="drawer-finding-explanation" class="drawer-text"></p>
+            </div>
+
+            <!-- Claim vs Reconstructed Math -->
+            <div class="drawer-section">
+                <span class="drawer-section-label">DETERMINISTIC CALCULATION VARIANCE</span>
+                <div class="drawer-table-box">
+                    <table class="drawer-math-table">
+                        <tbody>
+                            <tr>
+                                <td>Reported Claimed Value</td>
+                                <td id="drawer-val-reported" class="val-mono text-danger">$18,240.00</td>
+                            </tr>
+                            <tr>
+                                <td>Deterministic Truth</td>
+                                <td id="drawer-val-reconstructed" class="val-mono text-success">-$3,720.00</td>
+                            </tr>
+                            <tr>
+                                <td>Absolute Variance</td>
+                                <td id="drawer-val-variance" class="val-mono text-danger">$21,960.00</td>
+                            </tr>
+                            <tr>
+                                <td>Capital at Risk</td>
+                                <td id="drawer-val-capital" class="val-mono text-crit">$21,960.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Provenance & Cryptographic Hashes -->
+            <div class="drawer-section">
+                <span class="drawer-section-label">CRYPTOGRAPHIC PROVENANCE & CITED CODE</span>
+                <div class="drawer-provenance-list">
+                    <div class="prov-item">
+                        <span class="prov-label">Source Citation:</span>
+                        <code id="drawer-prov-file">strategy_alpha.py:1-50</code>
+                    </div>
+                    <div class="prov-item">
+                        <span class="prov-label">Source SHA-256:</span>
+                        <code id="drawer-prov-hash" class="hash-code">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>
+                    </div>
+                    <div class="prov-item">
+                        <span class="prov-label">Deterministic Verifier:</span>
+                        <code id="drawer-prov-verifier">pnl_recalculator_v2.2</code>
+                    </div>
+                    <div class="prov-item">
+                        <span class="prov-label">Verification Method:</span>
+                        <code id="drawer-prov-method">deterministic_fifo_recalculation</code>
+                    </div>
+                    <div class="prov-item">
+                        <span class="prov-label">Ingestion Normalizer:</span>
+                        <code id="drawer-prov-norm">canonical_financial_event_v1.2</code>
+                    </div>
+                    <div class="prov-item">
+                        <span class="prov-label">Evidence Dataset:</span>
+                        <code id="drawer-prov-data">trades_alpha_failure.csv (6 records)</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <div id="drawer-overlay" class="drawer-overlay hidden-drawer"></div>
+
+    <!-- PERSISTENT FOOTER -->
+    <footer class="command-footer">
+        <div class="footer-inner">
+            <div class="footer-left">
+                <strong>AUDITVECTOR</strong> • Autonomous Financial Integrity Investigator • All Things Agentic Hackathon Entry (Track: Taskmaster)
+            </div>
+            <div class="footer-right">
+                <span>Core Mandate: <strong>AI reasons. Code proves. Evidence explains.</strong></span>
+            </div>
+        </div>
     </footer>
 
     <script src="/static/app.js"></script>
