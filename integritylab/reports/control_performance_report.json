@@ -1,0 +1,10 @@
+{
+  "report_id": "REP-CONTROL-2026-Q1",
+  "system": "IntegrityLab-ControlCase",
+  "period": "2026-Q1",
+  "reported_pnl": 4500.00,
+  "reported_return_pct": 4.50,
+  "reported_fees": 50.00,
+  "reported_trades": 2,
+  "win_rate": 100.0
+}

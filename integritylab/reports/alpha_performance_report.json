@@ -1,0 +1,11 @@
+{
+  "report_id": "REP-ALPHA-2026-Q1",
+  "system": "IntegrityLab-Alpha",
+  "period": "2026-Q1",
+  "reported_pnl": 18240.00,
+  "reported_return_pct": 18.24,
+  "reported_fees": 440.00,
+  "reported_trades": 6,
+  "win_rate": 83.3,
+  "reported_sharpe": 2.14
+}

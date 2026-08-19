@@ -1,0 +1,28 @@
+steps:
+  # 1. Build container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/auditvector:$COMMIT_SHA', '.']
+
+  # 2. Push container image to Google Container Registry / Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/auditvector:$COMMIT_SHA']
+
+  # 3. Deploy container image to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'auditvector'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/auditvector:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'GEMINI_MODEL=gemini-3.5-flash'
+
+images:
+  - 'gcr.io/$PROJECT_ID/auditvector:$COMMIT_SHA'

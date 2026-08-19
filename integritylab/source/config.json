@@ -1,0 +1,14 @@
+{
+  "system_name": "IntegrityLab-Quant-Engine",
+  "version": "2.4.0",
+  "model_assumptions": {
+    "fee_model_bps": 5.0,
+    "fee_model_description": "Standard Tier 1 institutional rate (5 basis points)",
+    "initial_capital": 100000.0,
+    "currency": "USD"
+  },
+  "risk_limits": {
+    "max_drawdown_pct": 10.0,
+    "max_leverage": 2.0
+  }
+}

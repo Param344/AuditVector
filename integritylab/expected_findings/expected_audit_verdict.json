@@ -1,0 +1,58 @@
+{
+  "benchmark_name": "IntegrityLab_Synthetic_Benchmark",
+  "version": "1.0.0",
+  "expected_summary": {
+    "total_failures_confirmed": 4,
+    "total_controls_verified": 1,
+    "total_fabricated_findings": 0
+  },
+  "expected_findings": [
+    {
+      "finding_id": "F-001",
+      "title": "Return Polarity Contradiction",
+      "status": "CONTRADICTION",
+      "severity": "CRITICAL",
+      "source_file": "integritylab/source/strategy_alpha.py",
+      "expected_reported_return": 18.24,
+      "expected_reconstructed_return": -3.72
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Fee Double-Counting in Ending Equity",
+      "status": "CONTRADICTION",
+      "severity": "HIGH",
+      "source_file": "integritylab/source/fee_engine.py",
+      "expected_calculated_fees": 220.0,
+      "expected_reported_fees": 440.0
+    },
+    {
+      "finding_id": "F-003",
+      "title": "Configuration Fee Model Mismatch",
+      "status": "WARNING",
+      "severity": "MEDIUM",
+      "source_file": "integritylab/source/fee_engine.py",
+      "config_claimed_bps": 5.0,
+      "code_runtime_bps": 15.0
+    },
+    {
+      "finding_id": "F-004",
+      "title": "PnL Reconciliation Discrepancy",
+      "status": "CONTRADICTION",
+      "severity": "CRITICAL",
+      "source_file": "integritylab/source/strategy_alpha.py",
+      "expected_reported_pnl": 18240.0,
+      "expected_reconstructed_pnl": -3720.0,
+      "expected_variance": 21960.0
+    },
+    {
+      "finding_id": "F-005",
+      "title": "Control Strategy Calculation Soundness",
+      "status": "VERIFIED",
+      "severity": "LOW",
+      "source_file": "integritylab/source/control_strategy.py",
+      "expected_reported_pnl": 4500.0,
+      "expected_reconstructed_pnl": 4500.0,
+      "expected_variance": 0.0
+    }
+  ]
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUDITVECTOR — Autonomous Financial Integrity Investigator</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="logo-shield">
+                    <span class="logo-icon">🛡️</span>
+                </div>
+                <div>
+                    <h1 class="logo-title">AUDITVECTOR</h1>
+                    <span class="logo-tagline">AI reasons. Code proves. Evidence explains.</span>
+                </div>
+            </div>
+            <div class="header-status">
+                <div class="badge badge-adk">
+                    <span class="dot live"></span> Google ADK 2.7.1
+                </div>
+                <div class="badge badge-gemini">
+                    <span class="dot live"></span> Gemini 3.5 Flash
+                </div>
+                <div class="badge badge-duckdb">
+                    <span class="dot live"></span> DuckDB Analytics
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-container">
+        <!-- Control Bar -->
+        <section class="control-panel">
+            <div class="panel-header">
+                <h2>🎯 Autonomous Audit Controller</h2>
+                <div class="demo-buttons">
+                    <button id="btn-demo-alpha" class="btn btn-danger">
+                        <span>⚠️ Trigger IntegrityLab Alpha</span>
+                        <small>4 Planted Contradictions</small>
+                    </button>
+                    <button id="btn-demo-control" class="btn btn-success">
+                        <span>✅ Trigger IntegrityLab Control</span>
+                        <small>Clean Mathematical Truth</small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Custom Audit Configuration Accordion -->
+            <details class="custom-config-details">
+                <summary>⚙️ Custom Repository & Data Input</summary>
+                <div class="config-grid">
+                    <div class="input-group">
+                        <label for="input-project">Project Name</label>
+                        <input type="text" id="input-project" value="Custom-Quant-Strategy" placeholder="Project Name">
+                    </div>
+                    <div class="input-group">
+                        <label for="input-repo">Repository Path</label>
+                        <input type="text" id="input-repo" value="integritylab/source" placeholder="Path to code repo">
+                    </div>
+                    <div class="input-group">
+                        <label for="input-data">Trade Data CSV</label>
+                        <input type="text" id="input-data" value="integritylab/data/trades_alpha_failure.csv" placeholder="Path to trade CSV">
+                    </div>
+                    <div class="input-group">
+                        <label for="input-report">Report JSON</label>
+                        <input type="text" id="input-report" value="integritylab/reports/alpha_performance_report.json" placeholder="Path to report JSON">
+                    </div>
+                    <div class="input-group full-width">
+                        <button id="btn-run-custom" class="btn btn-primary">🚀 Execute Autonomous ADK Audit</button>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- Live Agent Execution Tracker -->
+        <section id="agent-tracker" class="agent-tracker hidden">
+            <div class="tracker-header">
+                <h3>🤖 5-Agent ADK Orchestration Stream</h3>
+                <div class="spinner"></div>
+            </div>
+            <div class="progress-bar-container">
+                <div id="audit-progress-bar" class="progress-bar" style="width: 0%;"></div>
+            </div>
+            <div class="agent-stages-grid">
+                <div id="stage-planner" class="stage-card">
+                    <div class="stage-icon">1</div>
+                    <div class="stage-info">
+                        <strong>Audit Planner</strong>
+                        <span class="stage-status">Idle</span>
+                    </div>
+                </div>
+                <div id="stage-repo" class="stage-card">
+                    <div class="stage-icon">2</div>
+                    <div class="stage-info">
+                        <strong>Repo Investigator</strong>
+                        <span class="stage-status">Idle</span>
+                    </div>
+                </div>
+                <div id="stage-fin" class="stage-card">
+                    <div class="stage-icon">3</div>
+                    <div class="stage-info">
+                        <strong>Financial Investigator</strong>
+                        <span class="stage-status">Idle</span>
+                    </div>
+                </div>
+                <div id="stage-contra" class="stage-card">
+                    <div class="stage-icon">4</div>
+                    <div class="stage-info">
+                        <strong>Contradiction Investigator</strong>
+                        <span class="stage-status">Idle</span>
+                    </div>
+                </div>
+                <div id="stage-report" class="stage-card">
+                    <div class="stage-icon">5</div>
+                    <div class="stage-info">
+                        <strong>Report Agent</strong>
+                        <span class="stage-status">Idle</span>
+                    </div>
+                </div>
+            </div>
+            <div class="logs-console">
+                <div class="console-title">Live Execution Logs:</div>
+                <pre id="console-output"></pre>
+            </div>
+        </section>
+
+        <!-- Audit Results Workspace -->
+        <section id="results-workspace" class="results-workspace hidden">
+            <!-- Verdict Banner -->
+            <div id="verdict-banner" class="verdict-banner">
+                <div class="verdict-title-area">
+                    <span id="verdict-icon" class="verdict-icon"></span>
+                    <div>
+                        <h2 id="verdict-text"></h2>
+                        <p id="verdict-desc"></p>
+                    </div>
+                </div>
+                <div class="capital-discrepancy-card">
+                    <span>Capital at Risk / Discrepancy</span>
+                    <strong id="capital-discrepancy">$0.00</strong>
+                </div>
+            </div>
+
+            <!-- Severity Metric Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card critical">
+                    <span class="count" id="count-critical">0</span>
+                    <span class="label">Critical Contradictions</span>
+                </div>
+                <div class="metric-card high">
+                    <span class="count" id="count-high">0</span>
+                    <span class="label">High Contradictions</span>
+                </div>
+                <div class="metric-card medium">
+                    <span class="count" id="count-medium">0</span>
+                    <span class="label">Warnings / Config Mismatches</span>
+                </div>
+                <div class="metric-card low">
+                    <span class="count" id="count-low">0</span>
+                    <span class="label">Verified Sound Claims</span>
+                </div>
+            </div>
+
+            <!-- Tabbed Explorer -->
+            <div class="tabs-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="tab-findings">🔍 Verified Findings (<span id="findings-tab-count">0</span>)</button>
+                    <button class="tab-btn" data-tab="tab-graph">🕸️ Evidence Graph</button>
+                    <button class="tab-btn" data-tab="tab-report">📄 Executive Markdown Report</button>
+                    <button class="tab-btn" data-tab="tab-duckdb">📊 DuckDB Analytics Profile</button>
+                </div>
+
+                <!-- Tab 1: Findings Explorer -->
+                <div id="tab-findings" class="tab-content active">
+                    <div id="findings-container" class="findings-list"></div>
+                </div>
+
+                <!-- Tab 2: Evidence Graph -->
+                <div id="tab-graph" class="tab-content">
+                    <div class="graph-header">
+                        <h4>Provenance Evidence Chains (Source $\to$ Normalizer $\to$ Verifier $\to$ Finding)</h4>
+                    </div>
+                    <div id="evidence-graph-container" class="evidence-graph-view"></div>
+                </div>
+
+                <!-- Tab 3: Markdown Report -->
+                <div id="tab-report" class="tab-content">
+                    <div class="report-actions">
+                        <button id="btn-copy-report" class="btn btn-secondary">📋 Copy Markdown</button>
+                    </div>
+                    <div id="markdown-viewer" class="markdown-viewer"></div>
+                </div>
+
+                <!-- Tab 4: DuckDB Profile -->
+                <div id="tab-duckdb" class="tab-content">
+                    <div id="duckdb-stats-view" class="duckdb-stats-view"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>AUDITVECTOR — All Things Agentic Hackathon Entry (Track: Taskmaster) • Built with Google ADK, Gemini 3.5+, DuckDB & Python Deterministic Verification</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
