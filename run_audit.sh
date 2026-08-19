@@ -15,6 +15,7 @@ REPO_PATH="$DIR/integritylab/source"
 DATA_FILE="$DIR/integritylab/data/trades_alpha_failure.csv"
 REPORT_FILE="$DIR/integritylab/reports/alpha_performance_report.json"
 PROJECT_NAME="IntegrityLab-Alpha"
+FEE_BPS=5.0
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -38,9 +39,13 @@ while [[ "$#" -gt 0 ]]; do
             PROJECT_NAME="$2"
             shift 2
             ;;
+        --fee-bps)
+            FEE_BPS="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: ./run_audit.sh [--demo alpha|control] [--repo <path>] [--data <path>] [--report <path>]"
+            echo "Usage: ./run_audit.sh [--demo alpha|control|aibip] [--repo <path>] [--data <path>] [--report <path>]"
             exit 1
             ;;
     esac
@@ -50,6 +55,12 @@ if [ "$DEMO_TYPE" == "control" ]; then
     DATA_FILE="$DIR/integritylab/data/trades_control_case.csv"
     REPORT_FILE="$DIR/integritylab/reports/control_performance_report.json"
     PROJECT_NAME="IntegrityLab-Control"
+elif [ "$DEMO_TYPE" == "aibip" ]; then
+    REPO_PATH="$DIR/dogfood/aibip/source"
+    DATA_FILE="$DIR/dogfood/aibip/data/trades_aibip_real.csv"
+    REPORT_FILE="$DIR/dogfood/aibip/reports/aibip_performance_report.json"
+    PROJECT_NAME="AI-BIP-Quant-Dogfood"
+    FEE_BPS=8.0
 fi
 
 echo "============================================================"
@@ -60,6 +71,7 @@ echo "Project: $PROJECT_NAME"
 echo "Source:  $REPO_PATH"
 echo "Dataset: $DATA_FILE"
 echo "Report:  $REPORT_FILE"
+echo "Fee Bps: $FEE_BPS"
 echo "------------------------------------------------------------"
 
 "$PYTHON_BIN" -c "
@@ -72,7 +84,8 @@ res = ADKRunner.run_audit(
     project_name='$PROJECT_NAME',
     repo_path='$REPO_PATH',
     data_file='$DATA_FILE',
-    report_file='$REPORT_FILE'
+    report_file='$REPORT_FILE',
+    claimed_fee_bps=$FEE_BPS
 )
 
 print(ReportAgent.render_markdown(res['report']))

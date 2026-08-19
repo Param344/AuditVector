@@ -1,0 +1,13 @@
+{
+  "project_name": "AI-BIP Quantitative Engine",
+  "audit_target": "Strategy Alpha Multi-Asset Momentum",
+  "reported_metrics": {
+    "reported_pnl": 54200.0,
+    "reported_return_pct": 21.68,
+    "reported_fees": 86.24,
+    "total_closed_trades": 8,
+    "win_rate_pct": 100.0,
+    "max_drawdown_pct": 4.5
+  },
+  "generated_at": "2026-01-18T00:00:00Z"
+}

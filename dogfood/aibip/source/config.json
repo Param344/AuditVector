@@ -1,0 +1,9 @@
+{
+  "system_name": "AI-BIP Quantitative Engine",
+  "version": "v4.2-prod",
+  "model_assumptions": {
+    "initial_capital_usd": 250000.0,
+    "fee_model_bps": 8.0,
+    "max_drawdown_limit_pct": 12.0
+  }
+}

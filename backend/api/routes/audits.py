@@ -18,9 +18,10 @@ router = APIRouter(prefix="/api/audits", tags=["Audits"])
 state_store = get_audit_state_store()
 publisher = get_audit_publisher(state_store)
 
-# Base repo paths for presets
+# Base paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 INTEGRITYLAB_DIR = os.path.join(BASE_DIR, "integritylab")
+DOGFOOD_DIR = os.path.join(BASE_DIR, "dogfood", "aibip")
 
 
 class CreateAuditRequest(BaseModel):
@@ -108,6 +109,25 @@ def trigger_demo_control():
     )
     publisher.publish_audit_job(record, claimed_fee_bps=5.0)
     return {"audit_id": audit_id, "demo": "Control Case Clean Fixture", "status": "QUEUED"}
+
+
+@router.post("/demo/aibip")
+def trigger_demo_aibip():
+    """Preset trigger for Real-World AI-BIP Quantitative Strategy Dogfood audit."""
+    repo_path = os.path.join(DOGFOOD_DIR, "source")
+    data_file = os.path.join(DOGFOOD_DIR, "data", "trades_aibip_real.csv")
+    report_file = os.path.join(DOGFOOD_DIR, "reports", "aibip_performance_report.json")
+    
+    audit_id = f"audit-{uuid.uuid4().hex[:8]}"
+    record = state_store.create_audit(
+        audit_id=audit_id,
+        project_name="AI-BIP-Quant-Dogfood",
+        repo_path=repo_path,
+        data_file=data_file,
+        report_file=report_file
+    )
+    publisher.publish_audit_job(record, claimed_fee_bps=8.0)
+    return {"audit_id": audit_id, "demo": "AI-BIP Real-World Dogfood Fixture", "status": "QUEUED"}
 
 
 @router.post("/pubsub/push")

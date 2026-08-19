@@ -190,6 +190,11 @@ body {
     color: #fff;
 }
 
+.btn-warning {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    color: #fff;
+}
+
 .btn-primary {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: #fff;

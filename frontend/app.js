@@ -90,6 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const btnDemoAIBIP = document.getElementById("btn-demo-aibip");
+
     // Trigger Demo Alpha
     btnDemoAlpha.addEventListener("click", () => {
         startAudit("/api/audits/demo/alpha", "POST");
@@ -99,6 +101,13 @@ document.addEventListener("DOMContentLoaded", () => {
     btnDemoControl.addEventListener("click", () => {
         startAudit("/api/audits/demo/control", "POST");
     });
+
+    // Trigger Demo AI-BIP
+    if (btnDemoAIBIP) {
+        btnDemoAIBIP.addEventListener("click", () => {
+            startAudit("/api/audits/demo/aibip", "POST");
+        });
+    }
 
     // Trigger Custom Audit
     btnRunCustom.addEventListener("click", () => {

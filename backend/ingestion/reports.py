@@ -22,6 +22,9 @@ class ReportIngestionAdapter:
             try:
                 data = json.loads(content)
                 metrics.update(data)
+                # Unpack nested reported_metrics dictionary if present
+                if "reported_metrics" in data and isinstance(data["reported_metrics"], dict):
+                    metrics.update(data["reported_metrics"])
             except Exception as e:
                 metrics["error"] = str(e)
         else:
