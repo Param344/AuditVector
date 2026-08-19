@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentReportMarkdown = "";
     let currentFindings = [];
     let currentActiveFilter = "ALL";
+    let currentAuditId = "";
 
     // Tab switching
     tabButtons.forEach(btn => {
@@ -87,6 +88,29 @@ document.addEventListener("DOMContentLoaded", () => {
             a.download = `AuditVector-Executive-Report-${new Date().toISOString().slice(0, 10)}.md`;
             a.click();
             URL.revokeObjectURL(url);
+        });
+    }
+
+    // Download Complete Evidence Bundle
+    const btnDownloadBundle = document.getElementById("btn-download-bundle");
+    if (btnDownloadBundle) {
+        btnDownloadBundle.addEventListener("click", async () => {
+            if (!currentAuditId) return;
+            try {
+                const res = await fetch(`/api/audits/${currentAuditId}/evidence-bundle`);
+                if (res.ok) {
+                    const bundleData = await res.json();
+                    const blob = new Blob([JSON.stringify(bundleData, null, 2)], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `AuditVector-Evidence-Bundle-${currentAuditId}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+            } catch (e) {
+                console.error("Failed to download evidence bundle:", e);
+            }
         });
     }
 
@@ -140,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(url, options);
             const data = await response.json();
             const auditId = data.audit_id;
+            currentAuditId = auditId;
 
             if (trackerAuditId) {
                 trackerAuditId.textContent = `Job ID: ${auditId}`;

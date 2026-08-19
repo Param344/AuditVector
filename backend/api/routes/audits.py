@@ -73,6 +73,29 @@ def get_audit_report_markdown(audit_id: str):
     return {"audit_id": audit_id, "markdown": md}
 
 
+@router.get("/{audit_id}/evidence-bundle")
+def get_audit_evidence_bundle(audit_id: str):
+    """Exports the full cryptographic evidence bundle for compliance and forensic archives."""
+    record = state_store.get_audit(audit_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Audit not found")
+    if not record.result:
+        raise HTTPException(status_code=400, detail="Audit is still in progress")
+    
+    bundle = {
+        "audit_id": audit_id,
+        "project_name": record.project_name,
+        "created_at": record.created_at,
+        "stage": record.stage,
+        "findings": record.result["report"].get("findings", []),
+        "evidence_graphs": record.result.get("evidence_graphs", []),
+        "summary_counts": record.result["report"].get("summary_counts", {}),
+        "total_capital_discrepancy": record.result["report"].get("total_capital_discrepancy", 0.0),
+        "markdown_report": ReportAgent.render_markdown(record.result["report"])
+    }
+    return bundle
+
+
 @router.post("/demo/alpha")
 def trigger_demo_alpha():
     """Preset trigger for IntegrityLab Alpha failure audit."""
