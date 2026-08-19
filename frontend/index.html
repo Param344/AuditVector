@@ -24,13 +24,16 @@
             </div>
             <div class="header-status">
                 <div class="badge badge-adk">
-                    <span class="dot live"></span> Google ADK 2.7.1
+                    <span class="dot live"></span> Google ADK 2.7
                 </div>
                 <div class="badge badge-gemini">
                     <span class="dot live"></span> Gemini 3.5 Flash
                 </div>
                 <div class="badge badge-duckdb">
-                    <span class="dot live"></span> DuckDB Analytics
+                    <span class="dot live"></span> DuckDB SQL
+                </div>
+                <div class="badge badge-gcp">
+                    <span class="dot live"></span> Cloud Run & Pub/Sub
                 </div>
             </div>
         </div>
@@ -41,15 +44,18 @@
         <!-- Control Bar -->
         <section class="control-panel">
             <div class="panel-header">
-                <h2>🎯 Autonomous Audit Controller</h2>
+                <div>
+                    <h2>🎯 Autonomous Audit Controller</h2>
+                    <p class="panel-sub">Autonomous multi-agent investigation of financial software, backtesters, and execution logs.</p>
+                </div>
                 <div class="demo-buttons">
                     <button id="btn-demo-alpha" class="btn btn-danger">
-                        <span>⚠️ Trigger IntegrityLab Alpha</span>
-                        <small>4 Planted Contradictions</small>
+                        <span>⚠️ Run IntegrityLab Alpha Demo</span>
+                        <small>4 Planted Contradictions & Failures</small>
                     </button>
                     <button id="btn-demo-control" class="btn btn-success">
-                        <span>✅ Trigger IntegrityLab Control</span>
-                        <small>Clean Mathematical Truth</small>
+                        <span>✅ Run IntegrityLab Control Case</span>
+                        <small>Clean Mathematical Ground Truth</small>
                     </button>
                 </div>
             </div>
@@ -75,7 +81,7 @@
                         <input type="text" id="input-report" value="integritylab/reports/alpha_performance_report.json" placeholder="Path to report JSON">
                     </div>
                     <div class="input-group full-width">
-                        <button id="btn-run-custom" class="btn btn-primary">🚀 Execute Autonomous ADK Audit</button>
+                        <button id="btn-run-custom" class="btn btn-primary">🚀 Launch Autonomous Multi-Agent Investigation</button>
                     </div>
                 </div>
             </details>
@@ -84,7 +90,10 @@
         <!-- Live Agent Execution Tracker -->
         <section id="agent-tracker" class="agent-tracker hidden">
             <div class="tracker-header">
-                <h3>🤖 5-Agent ADK Orchestration Stream</h3>
+                <div>
+                    <h3>🤖 5-Agent ADK Orchestration Stream</h3>
+                    <span id="tracker-audit-id" class="audit-id-badge">Audit: Initializing...</span>
+                </div>
                 <div class="spinner"></div>
             </div>
             <div class="progress-bar-container">
@@ -95,6 +104,7 @@
                     <div class="stage-icon">1</div>
                     <div class="stage-info">
                         <strong>Audit Planner</strong>
+                        <span class="stage-desc">Scoping & Pathways</span>
                         <span class="stage-status">Idle</span>
                     </div>
                 </div>
@@ -102,6 +112,7 @@
                     <div class="stage-icon">2</div>
                     <div class="stage-info">
                         <strong>Repo Investigator</strong>
+                        <span class="stage-desc">AST Code Mapping</span>
                         <span class="stage-status">Idle</span>
                     </div>
                 </div>
@@ -109,6 +120,7 @@
                     <div class="stage-icon">3</div>
                     <div class="stage-info">
                         <strong>Financial Investigator</strong>
+                        <span class="stage-desc">Claim Targets</span>
                         <span class="stage-status">Idle</span>
                     </div>
                 </div>
@@ -116,6 +128,7 @@
                     <div class="stage-icon">4</div>
                     <div class="stage-info">
                         <strong>Contradiction Investigator</strong>
+                        <span class="stage-desc">Deterministic Proof</span>
                         <span class="stage-status">Idle</span>
                     </div>
                 </div>
@@ -123,12 +136,13 @@
                     <div class="stage-icon">5</div>
                     <div class="stage-info">
                         <strong>Report Agent</strong>
+                        <span class="stage-desc">Executive Synthesis</span>
                         <span class="stage-status">Idle</span>
                     </div>
                 </div>
             </div>
             <div class="logs-console">
-                <div class="console-title">Live Execution Logs:</div>
+                <div class="console-title">Live Telemetry & Stage Logs:</div>
                 <pre id="console-output"></pre>
             </div>
         </section>
@@ -181,13 +195,22 @@
 
                 <!-- Tab 1: Findings Explorer -->
                 <div id="tab-findings" class="tab-content active">
+                    <div class="filter-bar">
+                        <span class="filter-label">Filter Findings:</span>
+                        <button class="filter-chip active" data-filter="ALL">All</button>
+                        <button class="filter-chip" data-filter="CRITICAL">🔴 Critical</button>
+                        <button class="filter-chip" data-filter="HIGH">🟠 High</button>
+                        <button class="filter-chip" data-filter="MEDIUM">🟡 Medium</button>
+                        <button class="filter-chip" data-filter="LOW">🟢 Verified</button>
+                    </div>
                     <div id="findings-container" class="findings-list"></div>
                 </div>
 
                 <!-- Tab 2: Evidence Graph -->
                 <div id="tab-graph" class="tab-content">
                     <div class="graph-header">
-                        <h4>Provenance Evidence Chains (Source $\to$ Normalizer $\to$ Verifier $\to$ Finding)</h4>
+                        <h4>Interactive Provenance Chains: Source Code $\longrightarrow$ Transaction Data $\longrightarrow$ Deterministic Verifier $\longrightarrow$ Verified Contradiction</h4>
+                        <p class="graph-sub">Every finding is anchored by a strict Evidence Contract. Click any chain node for forensic details.</p>
                     </div>
                     <div id="evidence-graph-container" class="evidence-graph-view"></div>
                 </div>
@@ -195,7 +218,8 @@
                 <!-- Tab 3: Markdown Report -->
                 <div id="tab-report" class="tab-content">
                     <div class="report-actions">
-                        <button id="btn-copy-report" class="btn btn-secondary">📋 Copy Markdown</button>
+                        <button id="btn-download-report" class="btn btn-secondary">💾 Download .md</button>
+                        <button id="btn-copy-report" class="btn btn-secondary">📋 Copy to Clipboard</button>
                     </div>
                     <div id="markdown-viewer" class="markdown-viewer"></div>
                 </div>
@@ -209,7 +233,7 @@
     </main>
 
     <footer class="app-footer">
-        <p>AUDITVECTOR — All Things Agentic Hackathon Entry (Track: Taskmaster) • Built with Google ADK, Gemini 3.5+, DuckDB & Python Deterministic Verification</p>
+        <p>AUDITVECTOR — Autonomous Financial Integrity Investigator • Built for All Things Agentic Hackathon (Track: Taskmaster) • Google ADK, Gemini 3.5+, DuckDB, Python & Cloud Run</p>
     </footer>
 
     <script src="/static/app.js"></script>

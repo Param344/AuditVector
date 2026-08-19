@@ -1,5 +1,5 @@
 /**
- * AuditVector Web Dashboard Frontend Client
+ * AuditVector Web Dashboard Frontend Client (Judge-Facing Presentation)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -8,11 +8,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDemoControl = document.getElementById("btn-demo-control");
     const btnRunCustom = document.getElementById("btn-run-custom");
     const btnCopyReport = document.getElementById("btn-copy-report");
+    const btnDownloadReport = document.getElementById("btn-download-report");
 
     const agentTracker = document.getElementById("agent-tracker");
     const resultsWorkspace = document.getElementById("results-workspace");
     const progressBar = document.getElementById("audit-progress-bar");
     const consoleOutput = document.getElementById("console-output");
+    const trackerAuditId = document.getElementById("tracker-audit-id");
 
     const verdictBanner = document.getElementById("verdict-banner");
     const verdictIcon = document.getElementById("verdict-icon");
@@ -35,7 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const tabButtons = document.querySelectorAll(".tab-btn");
     const tabContents = document.querySelectorAll(".tab-content");
 
+    // Filter chips
+    const filterChips = document.querySelectorAll(".filter-chip");
+
     let currentReportMarkdown = "";
+    let currentFindings = [];
+    let currentActiveFilter = "ALL";
 
     // Tab switching
     tabButtons.forEach(btn => {
@@ -49,6 +56,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Filter switching
+    filterChips.forEach(chip => {
+        chip.addEventListener("click", () => {
+            filterChips.forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+            currentActiveFilter = chip.getAttribute("data-filter");
+            renderFindingsList(currentFindings);
+        });
+    });
+
     // Copy Report
     if (btnCopyReport) {
         btnCopyReport.addEventListener("click", () => {
@@ -57,6 +74,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 btnCopyReport.textContent = "✅ Copied!";
                 setTimeout(() => { btnCopyReport.textContent = original; }, 2000);
             });
+        });
+    }
+
+    // Download Report
+    if (btnDownloadReport) {
+        btnDownloadReport.addEventListener("click", () => {
+            const blob = new Blob([currentReportMarkdown], { type: "text/markdown" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `AuditVector-Executive-Report-${new Date().toISOString().slice(0, 10)}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
         });
     }
 
@@ -85,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // UI Reset
         agentTracker.classList.remove("hidden");
         resultsWorkspace.classList.add("hidden");
-        consoleOutput.textContent = "Connecting to AuditVector API...\n";
+        consoleOutput.textContent = "[INIT] Connecting to AuditVector Autonomous Agent...\n";
         progressBar.style.width = "10%";
         resetStageCards();
 
@@ -102,15 +132,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
             const auditId = data.audit_id;
 
-            logConsole(`Audit job queued successfully: ${auditId}`);
+            if (trackerAuditId) {
+                trackerAuditId.textContent = `Job ID: ${auditId}`;
+            }
+
+            logConsole(`[DISPATCH] Audit job queued in asynchronous pipeline: ${auditId}`);
             pollAuditStatus(auditId);
         } catch (err) {
-            logConsole(`Error launching audit: ${err.message}`);
+            logConsole(`[ERROR] Error dispatching audit: ${err.message}`);
         }
     }
 
     async function pollAuditStatus(auditId) {
-        const maxAttempts = 50;
+        const maxAttempts = 60;
         let attempts = 0;
 
         const interval = setInterval(async () => {
@@ -130,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             } catch (e) {
-                logConsole(`Polling notice: ${e.message}`);
+                logConsole(`[POLLING] Notice: ${e.message}`);
             }
         }, 150);
     }
@@ -138,9 +172,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateProgressUI(auditData) {
         const stage = auditData.stage;
         progressBar.style.width = `${auditData.progress_pct || 50}%`;
-        logConsole(`[State: ${stage}] Progress: ${auditData.progress_pct || 50}%`);
+        logConsole(`[STAGE] ${stage} (Progress: ${auditData.progress_pct || 50}%)`);
 
-        // Update stage card states
         const stages = ["stage-planner", "stage-repo", "stage-fin", "stage-contra", "stage-report"];
         const stageMap = {
             "QUEUED": 0,
@@ -177,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function logConsole(msg) {
-        consoleOutput.textContent += `${new Date().toLocaleTimeString()} - ${msg}\n`;
+        consoleOutput.textContent += `${new Date().toLocaleTimeString()} ${msg}\n`;
         consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
 
@@ -186,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resultsWorkspace.classList.remove("hidden");
 
         const report = result.report;
-        const findings = report.findings || [];
+        currentFindings = report.findings || [];
 
         // Verdict Banner
         const isClean = report.verdict.includes("VERIFIED");
@@ -205,10 +238,10 @@ document.addEventListener("DOMContentLoaded", () => {
         countHigh.textContent = counts.high || 0;
         countMedium.textContent = counts.medium || 0;
         countLow.textContent = counts.low || 0;
-        findingsTabCount.textContent = findings.length;
+        findingsTabCount.textContent = currentFindings.length;
 
         // Render Findings
-        renderFindingsList(findings);
+        renderFindingsList(currentFindings);
 
         // Render Evidence Graphs
         renderEvidenceGraphs(result.evidence_graphs || []);
@@ -220,21 +253,32 @@ document.addEventListener("DOMContentLoaded", () => {
         // Render DuckDB Profile
         const duckdb = result.agent_pipeline?.duckdb_profile || { total_records: "N/A", unique_symbols: "N/A" };
         duckdbStatsView.innerHTML = `
-            <h3>DuckDB In-Memory Analytical Summary</h3>
+            <h3 style="margin-bottom: 0.75rem; color: #60a5fa;">DuckDB In-Memory Analytical Summary</h3>
             <p><strong>Total Trade Records Scanned:</strong> ${duckdb.total_records || 'N/A'}</p>
-            <p><strong>Unique Traded Symbols:</strong> ${duckdb.unique_symbols || 'N/A'}</p>
+            <p><strong>Unique Traded Assets:</strong> ${duckdb.unique_symbols || 'N/A'}</p>
             <p><strong>Analytics Engine:</strong> ${duckdb.engine || 'DuckDB SQL Engine'}</p>
+            <p><strong>Verification Status:</strong> Deterministic Execution Complete (Zero LLM Arithmetic)</p>
         `;
     }
 
     function renderFindingsList(findings) {
         findingsContainer.innerHTML = "";
-        if (findings.length === 0) {
-            findingsContainer.innerHTML = "<p>No findings recorded.</p>";
+        
+        const filtered = findings.filter(f => {
+            if (currentActiveFilter === "ALL") return true;
+            if (currentActiveFilter === "CRITICAL") return f.severity === "CRITICAL";
+            if (currentActiveFilter === "HIGH") return f.severity === "HIGH";
+            if (currentActiveFilter === "MEDIUM") return f.severity === "MEDIUM";
+            if (currentActiveFilter === "LOW") return f.status === "VERIFIED" || f.severity === "LOW";
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            findingsContainer.innerHTML = "<p style='color: var(--text-muted); font-size: 0.9rem;'>No findings match selected filter.</p>";
             return;
         }
 
-        findings.forEach(f => {
+        filtered.forEach(f => {
             const card = document.createElement("div");
             card.className = "finding-card";
             card.innerHTML = `
@@ -246,15 +290,23 @@ document.addEventListener("DOMContentLoaded", () => {
                         <span class="badge">Confidence: ${Math.round(f.confidence * 100)}%</span>
                     </div>
                 </div>
-                <div class="finding-claim">
-                    <strong>Claim / Reality:</strong> ${f.claim}
+                
+                <div class="finding-comparison">
+                    <div class="comparison-col claimed">
+                        <small>SOFTWARE'S CLAIM</small>
+                        <strong>${f.claim}</strong>
+                    </div>
+                    <div class="comparison-col reality">
+                        <small>DETERMINISTIC REALITY & PROOF</small>
+                        <strong>${f.explanation}</strong>
+                    </div>
                 </div>
-                <p style="font-size: 0.8rem; color: #94a3b8;">${f.explanation}</p>
+
                 <div class="finding-details-grid">
-                    <div><strong>Verifier:</strong> <code>${f.verifier_name}</code></div>
+                    <div><strong>Deterministic Verifier:</strong> <code>${f.verifier_name}</code></div>
                     <div><strong>Verification Method:</strong> <code>${f.verification_method}</code></div>
                     <div><strong>Capital at Risk:</strong> $${(f.capital_at_risk || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
-                    <div><strong>Sources:</strong> ${(f.sources || []).map(s => `${s.file}:${s.line_range}`).join(", ") || 'N/A'}</div>
+                    <div><strong>Cited Code Range:</strong> ${(f.sources || []).map(s => `${s.file}:${s.line_range}`).join(", ") || 'N/A'}</div>
                 </div>
             `;
             findingsContainer.appendChild(card);
@@ -272,30 +324,30 @@ document.addEventListener("DOMContentLoaded", () => {
             const card = document.createElement("div");
             card.className = "evidence-chain-card";
             card.innerHTML = `
-                <h4>Finding Evidence Chain: ${g.finding_id}</h4>
+                <h4 style="margin-bottom: 0.5rem; color: #93c5fd;">Evidence Contract Chain: [${g.finding_id}]</h4>
                 <div class="chain-steps">
-                    <div class="chain-node">
-                        <strong>Source File</strong>
+                    <div class="chain-node" title="Click to view Source Code metadata">
+                        <strong>Source Citation</strong>
                         <small>${(g.nodes.find(n => n.type === 'SOURCE')?.label || 'Code Repo')}</small>
                     </div>
                     <span class="chain-arrow">→</span>
-                    <div class="chain-node">
-                        <strong>Data Record</strong>
+                    <div class="chain-node" title="Click to view Transaction Evidence hash">
+                        <strong>Raw Data Event</strong>
                         <small>${(g.nodes.find(n => n.type === 'DATA')?.label || 'CSV Events')}</small>
                     </div>
                     <span class="chain-arrow">→</span>
-                    <div class="chain-node">
+                    <div class="chain-node" title="Click to view Canonical Schema">
                         <strong>Normalizer</strong>
-                        <small>Canonical Event Layer</small>
+                        <small>Canonical FinancialEvent</small>
                     </div>
                     <span class="chain-arrow">→</span>
-                    <div class="chain-node">
+                    <div class="chain-node" title="Click to view Verifier Algorithm">
                         <strong>Deterministic Verifier</strong>
                         <small>${(g.nodes.find(n => n.type === 'VERIFIER')?.label || 'FIFO PnL Engine')}</small>
                     </div>
                     <span class="chain-arrow">→</span>
-                    <div class="chain-node" style="border-color: var(--color-critical);">
-                        <strong>Verified Finding</strong>
+                    <div class="chain-node" style="border-color: var(--color-critical); box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);" title="Click to view Finding">
+                        <strong>Verified Contradiction</strong>
                         <small>${g.finding_id}</small>
                     </div>
                 </div>

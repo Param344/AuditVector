@@ -1,4 +1,4 @@
-/* AuditVector Modern Cyber-Terminal Theme */
+/* AuditVector Cyber-Terminal Theme */
 
 :root {
     --bg-primary: #0a0e17;
@@ -50,6 +50,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .brand {
@@ -60,15 +62,16 @@ body {
 
 .logo-shield {
     background: linear-gradient(135deg, #2563eb, #1e40af);
-    padding: 0.5rem;
-    border-radius: 8px;
-    font-size: 1.5rem;
+    padding: 0.6rem;
+    border-radius: 10px;
+    font-size: 1.6rem;
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
 }
 
 .logo-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 800;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     background: linear-gradient(90deg, #60a5fa, #38bdf8);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -82,7 +85,8 @@ body {
 
 .header-status {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.6rem;
+    flex-wrap: wrap;
 }
 
 .badge {
@@ -102,7 +106,7 @@ body {
     height: 6px;
     border-radius: 50%;
     background-color: var(--color-verified);
-    box-shadow: 0 0 6px var(--color-verified);
+    box-shadow: 0 0 8px var(--color-verified);
 }
 
 /* Main Container */
@@ -130,17 +134,24 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .panel-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: 700;
+}
+
+.panel-sub {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
 }
 
 .demo-buttons {
     display: flex;
     gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .btn {
@@ -159,13 +170,14 @@ body {
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
 .btn small {
     font-weight: 400;
     font-size: 0.7rem;
     opacity: 0.85;
+    margin-top: 0.15rem;
 }
 
 .btn-danger {
@@ -182,7 +194,8 @@ body {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: #fff;
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.85rem;
+    font-size: 0.95rem;
 }
 
 .btn-secondary {
@@ -245,7 +258,7 @@ body {
     border: 1px solid var(--border-accent);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.15);
 }
 
 .tracker-header {
@@ -255,9 +268,19 @@ body {
     margin-bottom: 1rem;
 }
 
+.audit-id-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
 .spinner {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border: 2px solid rgba(59, 130, 246, 0.3);
     border-top-color: var(--border-accent);
     border-radius: 50%;
@@ -284,7 +307,7 @@ body {
 
 .agent-stages-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
 }
 
@@ -292,15 +315,17 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 0.75rem;
+    padding: 0.85rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    transition: all 0.3s ease;
 }
 
 .stage-card.active {
     border-color: var(--border-accent);
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
 }
 
 .stage-card.completed {
@@ -309,15 +334,15 @@ body {
 }
 
 .stage-icon {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-family: var(--font-mono);
 }
 
@@ -332,12 +357,19 @@ body {
 }
 
 .stage-info strong {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+}
+
+.stage-desc {
+    font-size: 0.65rem;
+    color: var(--text-muted);
 }
 
 .stage-status {
     font-size: 0.7rem;
-    color: var(--text-muted);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 0.15rem;
 }
 
 .logs-console {
@@ -345,7 +377,7 @@ body {
     background: #000;
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 0.75rem;
+    padding: 0.85rem;
 }
 
 .console-title {
@@ -359,9 +391,10 @@ body {
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: #38bdf8;
-    max-height: 120px;
+    max-height: 140px;
     overflow-y: auto;
     white-space: pre-wrap;
+    line-height: 1.4;
 }
 
 /* Results Workspace */
@@ -417,7 +450,7 @@ body {
 }
 
 .capital-discrepancy-card strong {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--color-critical);
     font-family: var(--font-mono);
 }
@@ -441,7 +474,7 @@ body {
 }
 
 .metric-card .count {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 800;
     font-family: var(--font-mono);
 }
@@ -500,11 +533,43 @@ body {
     display: block;
 }
 
+/* Filter Bar */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.filter-chip {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-chip.active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
 /* Findings List */
 .findings-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .finding-card {
@@ -514,7 +579,7 @@ body {
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.85rem;
     transition: all 0.2s ease;
 }
 
@@ -547,21 +612,36 @@ body {
 .status-WARNING { background: rgba(234, 179, 8, 0.2); color: var(--color-medium); border: 1px solid var(--color-medium); }
 .status-VERIFIED { background: rgba(16, 185, 129, 0.2); color: var(--color-verified); border: 1px solid var(--color-verified); }
 
-.finding-claim {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 0.75rem;
+.finding-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.85rem;
     border-radius: 6px;
     font-family: var(--font-mono);
     font-size: 0.8rem;
-    color: #e2e8f0;
 }
+
+.comparison-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.comparison-col.claimed { border-right: 1px solid var(--border-color); padding-right: 0.75rem; }
+.comparison-col small { font-size: 0.65rem; color: var(--text-muted); }
+.comparison-col strong { color: #f87171; }
+.comparison-col.reality strong { color: #34d399; }
 
 .finding-details-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 0.75rem;
     font-size: 0.75rem;
     color: var(--text-secondary);
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color);
 }
 
 /* Evidence Graph View */
@@ -595,6 +675,13 @@ body {
     font-family: var(--font-mono);
     display: flex;
     flex-direction: column;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chain-node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
 }
 
 .chain-node small {
@@ -605,6 +692,7 @@ body {
 .chain-arrow {
     color: var(--border-accent);
     font-size: 1.2rem;
+    font-weight: 700;
 }
 
 /* Markdown Viewer */
@@ -618,7 +706,7 @@ body {
     color: #e2e8f0;
     line-height: 1.6;
     white-space: pre-wrap;
-    max-height: 500px;
+    max-height: 550px;
     overflow-y: auto;
 }
 
@@ -626,6 +714,7 @@ body {
     margin-bottom: 1rem;
     display: flex;
     justify-content: flex-end;
+    gap: 0.75rem;
 }
 
 /* DuckDB Stats View */
@@ -633,9 +722,10 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 1.25rem;
+    padding: 1.5rem;
     font-family: var(--font-mono);
     font-size: 0.85rem;
+    line-height: 1.6;
 }
 
 /* Footer */

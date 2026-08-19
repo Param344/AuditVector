@@ -20,12 +20,14 @@ class TestFrontendServing(unittest.TestCase):
     def test_serve_static_css(self):
         response = self.client.get("/static/styles.css")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("AuditVector Modern Cyber-Terminal Theme", response.text)
+        self.assertIn("AuditVector", response.text)
+        self.assertIn("--bg-primary", response.text)
 
     def test_serve_static_javascript(self):
         response = self.client.get("/static/app.js")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("AuditVector Web Dashboard Frontend Client", response.text)
+        self.assertIn("AuditVector", response.text)
+        self.assertIn("DOMContentLoaded", response.text)
 
 
 if __name__ == "__main__":
