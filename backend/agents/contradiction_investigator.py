@@ -96,6 +96,8 @@ class ContradictionInvestigator:
                     calculation=CalculationVariance(
                         reported_pnl=reported_pnl,
                         reconstructed_pnl=reconstructed_pnl,
+                        reported_return_pct=recon["return_analysis"].get("reported_return_pct"),
+                        reconstructed_return_pct=recon["return_analysis"].get("calculated_return_pct"),
                         variance_amount=reported_pnl - reconstructed_pnl
                     ),
                     verification_method="deterministic_fifo_recalculation",

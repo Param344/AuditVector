@@ -75,12 +75,12 @@ body.forensic-theme {
    ========================================================================== */
 
 .command-bar {
-    background-color: rgba(11, 17, 28, 0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-subtle);
+    background-color: #0b111c;
+    border-bottom: 1px solid var(--border-medium);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
 .command-bar-inner {
@@ -476,6 +476,11 @@ body.forensic-theme {
     justify-content: space-between;
     align-items: center;
     user-select: none;
+    list-style: none;
+}
+
+.custom-summary::-webkit-details-marker {
+    display: none;
 }
 
 .custom-summary:hover {
@@ -974,6 +979,13 @@ body.forensic-theme {
     font-size: 1.8rem;
     font-weight: 800;
     color: var(--color-crit);
+}
+
+.stat-number-ver {
+    font-family: var(--font-mono);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--color-ver);
 }
 
 .stat-sub {

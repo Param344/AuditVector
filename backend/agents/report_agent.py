@@ -44,6 +44,7 @@ class ReportAgent:
                 "medium": medium_count,
                 "low": low_count
             },
+            "total_capital_discrepancy": total_risk_capital,
             "financial_impact": {
                 "total_capital_discrepancy": total_risk_capital
             },
