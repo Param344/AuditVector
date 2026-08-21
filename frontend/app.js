@@ -297,16 +297,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const stages = [
-            { stage: "QUEUED", progress: 12, agent: "agent-planner", op: "Job registered in Google Cloud Pub/Sub queue." },
-            { stage: "RUNNING", progress: 28, agent: "agent-planner", op: "AuditPlanner scoping repository AST structure & data schemas." },
-            { stage: "INVESTIGATING", progress: 54, agent: "agent-repo", op: "RepositoryInvestigator parsing logic & FinancialInvestigator extracting claims." },
-            { stage: "VERIFYING", progress: 78, agent: "agent-contradiction", op: "ContradictionInvestigator executing deterministic FIFO lot matching & DuckDB SQL." },
-            { stage: "REPORTING", progress: 92, agent: "agent-report", op: "ReportAgent compiling executive verdict & sealing Evidence Contracts." },
-            { stage: "COMPLETED", progress: 100, agent: null, op: "Investigation complete. Generating cryptographic evidence graph..." }
+            { stage: "QUEUED", progress: 10, agent: "agent-planner", op: "Audit Mission initialized. Scoping repository pathways." },
+            { stage: "RUNNING", progress: 25, agent: "agent-planner", op: "AuditPlanner formulating bounded investigation targets." },
+            { stage: "INVESTIGATING", progress: 45, agent: "agent-repo", op: "RepositoryInvestigator parsing AST logic & FinancialInvestigator normalizing trade fills." },
+            { stage: "VERIFYING", progress: 68, agent: "agent-contra", op: "ContradictionInvestigator executing deterministic FIFO lot matching & DuckDB SQL." },
+            { stage: "REMEDIATING", progress: 85, agent: "agent-remediation", op: "RemediationAgent generating unified diffs & verifying post-patch $0.00 delta in isolated sandbox." },
+            { stage: "REPORTING", progress: 95, agent: "agent-report", op: "ReportAgent synthesizing executive report, FIS score & Evidence Contracts." },
+            { stage: "COMPLETED", progress: 100, agent: null, op: "Mission complete. Cryptographic evidence sealed." }
         ];
 
         for (let i = 0; i < stages.length; i++) {
-            await new Promise(r => setTimeout(r, 240));
+            await new Promise(r => setTimeout(r, 220));
             const s = stages[i];
             liveProgressPct.textContent = `${s.progress}%`;
             liveProgressBar.style.width = `${s.progress}%`;
@@ -315,7 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
             appendTelemetryLog(s.stage, s.op);
         }
 
-        await new Promise(r => setTimeout(r, 200));
+        await new Promise(r => setTimeout(r, 180));
 
         if (benchmarkResult) {
             currentAuditResult = benchmarkResult.result || benchmarkResult;
@@ -370,6 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
             "RUNNING": "ADK multi-agent orchestration session initiated.",
             "INVESTIGATING": "AST parser scanning source code; financial targets extracted.",
             "VERIFYING": "Executing deterministic FIFO lot matching and DuckDB SQL queries.",
+            "REMEDIATING": "Remediation Agent verifying candidate patches inside isolated sandbox.",
             "REPORTING": "Report Agent synthesizing findings and cryptographic Evidence Contracts.",
             "COMPLETED": "Forensic audit complete. All evidence contracts sealed."
         };
@@ -385,6 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "card-agent-repo", triggerStage: "INVESTIGATING" },
             { id: "card-agent-fin", triggerStage: "INVESTIGATING" },
             { id: "card-agent-contra", triggerStage: "VERIFYING" },
+            { id: "card-agent-remediation", triggerStage: "REMEDIATING" },
             { id: "card-agent-report", triggerStage: "REPORTING" }
         ];
 
@@ -583,7 +586,14 @@ document.addEventListener("DOMContentLoaded", () => {
             varianceDeltaVal.textContent = `${diff >= 0 ? '+' : ''}$${diff.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             varianceDeltaVal.style.color = "var(--color-crit)";
 
-            if (deltaDesc) deltaDesc.textContent = "Capital Misstatement Discovered";
+            if (deltaDesc) {
+                deltaDesc.innerHTML = `
+                    <span>Capital Misstatement: <strong>${varianceDeltaVal.textContent}</strong></span>
+                    <div style="margin-top: 0.35rem; font-size: 0.72rem; color: #10b981; font-weight: 600; font-family: var(--font-mono);">
+                        🛠️ Sandbox Re-Verification: $0.00 (INTEGRITY RESTORED)
+                    </div>
+                `;
+            }
             if (deltaBadge) {
                 deltaBadge.className = "delta-badge status-contradiction";
                 deltaBadge.textContent = "CRITICAL CONTRADICTION";

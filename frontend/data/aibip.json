@@ -1,14 +1,12 @@
 {
   "status": "COMPLETED",
-  "audit_id": "mission-demo-aibip",
-  "project_name": "AI-BIP Quantitative Strategy (Real Dogfood)",
+  "audit_id": "audit-aibip-demo",
+  "project_name": "AI-BIP-Quant-Dogfood",
   "mode": "OFFLINE_DETERMINISTIC",
   "gemini_model": "gemini-3.5-flash",
-  "duration_seconds": 0.07,
-  "financial_integrity_score": {
-    "score": 65.5,
-    "grade": "C"
-  },
+  "duration_seconds": 0.09,
+  "financial_integrity_score": 65.5,
+  "integrity_grade": "C",
   "remediation_plans": [
     {
       "plan_id": "plan-f-001",
@@ -29,7 +27,7 @@
         "post_patch_status": "VERIFIED_SOUND",
         "tests_passed": 4,
         "tests_total": 4,
-        "execution_time_ms": 0.54,
+        "execution_time_ms": 0.83,
         "sandbox_path": "isolated_temp_sandbox"
       },
       "human_approval_required": true,
@@ -53,169 +51,172 @@
         "pre_patch_status": "WARNING",
         "post_patch_status": "VERIFIED_SOUND",
         "tests_passed": 3,
-        "tests_total": 3,
-        "execution_time_ms": 0.94,
+        "tests_total": 4,
+        "execution_time_ms": 4.05,
         "sandbox_path": "isolated_temp_sandbox"
       },
       "human_approval_required": true,
       "applied_to_repo": false
     }
   ],
-  "adaptive_decisions": [
-    {
-      "decision_index": 1,
-      "timestamp": 1787329518.265719,
-      "trigger_agent": "AuditPlanner",
-      "reasoning": "Identified repository path 'dogfood/aibip' and dataset 'dogfood/aibip/data/trades_aibip_real.csv'. Validating schema readiness.",
-      "chosen_action": "ROUTE_TO_AST_SCOPING",
-      "target_tool": "scan_repository_ast",
-      "parameters": {
-        "repo_path": "dogfood/aibip"
-      },
-      "outcome": "Dispatched RepositoryInvestigator for bounded AST method discovery."
-    },
-    {
-      "decision_index": 2,
-      "timestamp": 1787329518.267997,
-      "trigger_agent": "RepositoryInvestigator",
-      "reasoning": "AST mapping located 0 financial functions. Routing to claim extractor.",
-      "chosen_action": "ROUTE_TO_CLAIM_EXTRACTION",
-      "target_tool": "load_normalized_trades",
-      "parameters": {
-        "report_file": "dogfood/aibip/reports/aibip_performance_report.json"
-      },
-      "outcome": "Dispatched FinancialInvestigator to extract reported metrics."
-    },
-    {
-      "decision_index": 3,
-      "timestamp": 1787329518.269567,
-      "trigger_agent": "FinancialInvestigator",
-      "reasoning": "Extracted 0 performance claim targets with 8 canonical fills. Routing to deterministic verifiers.",
-      "chosen_action": "ROUTE_TO_DETERMINISTIC_RECONCILIATION",
-      "target_tool": "execute_trade_reconciliation",
-      "parameters": {
-        "record_count": 8,
-        "initial_capital": 100000.0
-      },
-      "outcome": "Dispatched ContradictionInvestigator for bottom-up FIFO lot matching."
-    },
-    {
-      "decision_index": 4,
-      "timestamp": 1787329518.3166971,
-      "trigger_agent": "ContradictionInvestigator",
-      "reasoning": "Confirmed 2 findings with total capital discrepancy of $17,062.40. Routing to RemediationAgent for sandbox verification.",
-      "chosen_action": "ROUTE_TO_REMEDIATION_SANDBOX",
-      "target_tool": "verify_remediation_sandbox",
-      "parameters": {
-        "discrepancy": 17062.399999999998,
-        "findings_count": 2
-      },
-      "outcome": "Dispatched RemediationAgent to formulate unified diff patches and re-verify in sandbox."
-    },
-    {
-      "decision_index": 5,
-      "timestamp": 1787329518.323568,
-      "trigger_agent": "RemediationAgent",
-      "reasoning": "Verified 2 remediation patches inside isolated sandbox. Post-patch discrepancy confirmed at $0.00.",
-      "chosen_action": "ROUTE_TO_REPORT_SYNTHESIS",
-      "target_tool": "generate_report",
-      "parameters": {
-        "verified_patches": 2
-      },
-      "outcome": "Routing to ReportAgent for final executive synthesis."
-    }
-  ],
-  "replay_snapshots": [
-    {
-      "step_index": 1,
-      "timestamp": 1787329518.249072,
-      "elapsed_ms": 0.0,
-      "stage": "PLANNING",
-      "active_agent": "AuditPlanner",
-      "description": "Scoping repository structure and validating transactional datasets",
-      "findings_count": 0,
-      "progress_pct": 15,
-      "evidence_count": 0
-    },
-    {
-      "step_index": 2,
-      "timestamp": 1787329518.26574,
-      "elapsed_ms": 16.7,
-      "stage": "AST_SCOPING",
-      "active_agent": "RepositoryInvestigator",
-      "description": "Parsing AST syntax trees to map calculation routines",
-      "findings_count": 0,
-      "progress_pct": 30,
-      "evidence_count": 0
-    },
-    {
-      "step_index": 3,
-      "timestamp": 1787329518.2680142,
-      "elapsed_ms": 19.0,
-      "stage": "CLAIM_EXTRACTION",
-      "active_agent": "FinancialInvestigator",
-      "description": "Extracting claimed performance metrics and normalizing trade fills",
-      "findings_count": 0,
-      "progress_pct": 45,
-      "evidence_count": 1
-    },
-    {
-      "step_index": 4,
-      "timestamp": 1787329518.269591,
-      "elapsed_ms": 20.5,
-      "stage": "ADAPTIVE_VERIFICATION",
-      "active_agent": "ContradictionInvestigator",
-      "description": "Executing deterministic FIFO reconciliation and DuckDB SQL profiling",
-      "findings_count": 0,
-      "progress_pct": 65,
-      "evidence_count": 2
-    },
-    {
-      "step_index": 5,
-      "timestamp": 1787329518.316724,
-      "elapsed_ms": 67.7,
-      "stage": "REMEDIATION_SANDBOX",
-      "active_agent": "RemediationAgent",
-      "description": "Formulating unified diffs and testing patches inside isolated sandbox",
-      "findings_count": 2,
-      "progress_pct": 80,
-      "evidence_count": 3
-    },
-    {
-      "step_index": 6,
-      "timestamp": 1787329518.323589,
-      "elapsed_ms": 74.5,
-      "stage": "REPORT_SYNTHESIS",
-      "active_agent": "ReportAgent",
-      "description": "Synthesizing executive report and sealing cryptographic provenance graphs",
-      "findings_count": 2,
-      "progress_pct": 95,
-      "evidence_count": 3
-    },
-    {
-      "step_index": 7,
-      "timestamp": 1787329518.323829,
-      "elapsed_ms": 74.8,
-      "stage": "VERDICT_SEALED",
-      "active_agent": "ReportAgent",
-      "description": "Audit mission complete with FIS 65.5/100 (C)",
-      "findings_count": 2,
-      "progress_pct": 100,
-      "evidence_count": 3
-    }
-  ],
   "agent_pipeline": {
     "planner": {
-      "repo_path": "dogfood/aibip"
+      "repo_scan": {
+        "total_files": 5,
+        "financial_modules": [
+          "source/slippage_model.py",
+          "source/config.json",
+          "source/backtest_engine.py",
+          "data/trades_aibip_real.csv",
+          "reports/aibip_performance_report.json"
+        ],
+        "files": {
+          "source/slippage_model.py": {
+            "path": "source/slippage_model.py",
+            "abs_path": "dogfood/aibip/source/slippage_model.py",
+            "hash": "eb1558d4a6cf3e98ca86096f870ac59bf2d41cca524f9e77d85502487ee85eba",
+            "line_count": 13,
+            "keywords": [
+              "fee",
+              "return",
+              "trade",
+              "execution",
+              "slippage"
+            ],
+            "is_financial": true
+          },
+          "source/config.json": {
+            "path": "source/config.json",
+            "abs_path": "dogfood/aibip/source/config.json",
+            "hash": "9bc4c8ae200117c0c91727eebdd5e1c4d86a911be82515cd3f6753314068536d",
+            "line_count": 9,
+            "keywords": [
+              "fee",
+              "drawdown"
+            ],
+            "is_financial": true
+          },
+          "source/backtest_engine.py": {
+            "path": "source/backtest_engine.py",
+            "abs_path": "dogfood/aibip/source/backtest_engine.py",
+            "hash": "e85e2cd23d7f13e92b01a27155d4be8655f02863543b81699f6400e6657e5888",
+            "line_count": 20,
+            "keywords": [
+              "pnl",
+              "return",
+              "equity"
+            ],
+            "is_financial": true
+          },
+          "data/trades_aibip_real.csv": {
+            "path": "data/trades_aibip_real.csv",
+            "abs_path": "dogfood/aibip/data/trades_aibip_real.csv",
+            "hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8",
+            "line_count": 9,
+            "keywords": [
+              "commission",
+              "trade"
+            ],
+            "is_financial": true
+          },
+          "reports/aibip_performance_report.json": {
+            "path": "reports/aibip_performance_report.json",
+            "abs_path": "dogfood/aibip/reports/aibip_performance_report.json",
+            "hash": "c4c5377994cb9a87fa7d560ddd845306946d06065f9989c2ae154394de3378ab",
+            "line_count": 13,
+            "keywords": [
+              "pnl",
+              "fee",
+              "return",
+              "drawdown",
+              "trade"
+            ],
+            "is_financial": true
+          }
+        }
+      },
+      "data_path": "dogfood/aibip/data/trades_aibip_real.csv",
+      "report_path": "dogfood/aibip/reports/aibip_performance_report.json",
+      "audit_plan": [
+        {
+          "step": 1,
+          "task": "Redact secrets from discovered source and config files",
+          "status": "PLANNED"
+        },
+        {
+          "step": 2,
+          "task": "Ingest and normalize raw trade event datasets to Canonical FinancialEvent model",
+          "status": "PLANNED"
+        },
+        {
+          "step": 3,
+          "task": "Map financial calculation pathways in discovered code modules",
+          "modules": [
+            "source/slippage_model.py",
+            "source/config.json",
+            "source/backtest_engine.py",
+            "data/trades_aibip_real.csv",
+            "reports/aibip_performance_report.json"
+          ],
+          "status": "PLANNED"
+        },
+        {
+          "step": 4,
+          "task": "Execute bottom-up deterministic PnL reconstruction",
+          "status": "PLANNED"
+        },
+        {
+          "step": 5,
+          "task": "Analyze fee accounting for double-counting and model rate variances",
+          "status": "PLANNED"
+        },
+        {
+          "step": 6,
+          "task": "Evaluate return calculation polarity and sign consistency",
+          "status": "PLANNED"
+        },
+        {
+          "step": 7,
+          "task": "Cross-reconcile reported performance claims against deterministic truth",
+          "status": "PLANNED"
+        },
+        {
+          "step": 8,
+          "task": "Formulate Evidence Contracts for verified findings",
+          "status": "PLANNED"
+        },
+        {
+          "step": 9,
+          "task": "Generate executive financial integrity audit report",
+          "status": "PLANNED"
+        }
+      ]
     },
     "repository_investigator": {
-      "files_scanned": 1
+      "total_mapped_modules": 2,
+      "modules": {
+        "source/slippage_model.py": {
+          "functions": [
+            "calculate_trade_fee"
+          ],
+          "keywords": [
+            "trade",
+            "fee"
+          ],
+          "hash": "eb1558d4a6cf3e98ca86096f870ac59bf2d41cca524f9e77d85502487ee85eba"
+        },
+        "source/backtest_engine.py": {
+          "functions": [
+            "__init__",
+            "calculate_strategy_performance"
+          ],
+          "keywords": [],
+          "hash": "e85e2cd23d7f13e92b01a27155d4be8655f02863543b81699f6400e6657e5888"
+        }
+      },
+      "call_graph": []
     },
-    "financial_investigator": [
-      {
-        "target": "pnl"
-      }
-    ],
+    "financial_investigator": [],
     "contradiction_investigator": [
       {
         "finding_id": "F-001",
@@ -245,7 +246,7 @@
           "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
         },
         "provenance": {
-          "timestamp": "2026-08-21T16:25:18.273145+00:00",
+          "timestamp": "2026-08-21T16:41:31.570894+00:00",
           "normalizer_version": "v1.2.0",
           "verifier_version": "verifier_suite_v1.0",
           "transformation": "canonical_financial_event_normalization"
@@ -305,7 +306,7 @@
           "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
         },
         "provenance": {
-          "timestamp": "2026-08-21T16:25:18.273145+00:00",
+          "timestamp": "2026-08-21T16:41:31.570894+00:00",
           "normalizer_version": "v1.2.0",
           "verifier_version": "verifier_suite_v1.0",
           "transformation": "canonical_financial_event_normalization"
@@ -356,7 +357,7 @@
           "post_patch_status": "VERIFIED_SOUND",
           "tests_passed": 4,
           "tests_total": 4,
-          "execution_time_ms": 0.54,
+          "execution_time_ms": 0.83,
           "sandbox_path": "isolated_temp_sandbox"
         },
         "human_approval_required": true,
@@ -380,8 +381,8 @@
           "pre_patch_status": "WARNING",
           "post_patch_status": "VERIFIED_SOUND",
           "tests_passed": 3,
-          "tests_total": 3,
-          "execution_time_ms": 0.94,
+          "tests_total": 4,
+          "execution_time_ms": 4.05,
           "sandbox_path": "isolated_temp_sandbox"
         },
         "human_approval_required": true,
@@ -389,7 +390,22 @@
       }
     ],
     "report_agent": {
-      "verdict": "AIBIP VERDICT",
+      "title": "AUDITVECTOR FINANCIAL INTEGRITY REPORT",
+      "project_name": "AI-BIP-Quant-Dogfood",
+      "duration_seconds": 0.09,
+      "verdict": "\u26a0\ufe0f RESULTS NOT FULLY TRUSTWORTHY",
+      "verdict_summary": "AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.",
+      "summary_counts": {
+        "total_findings": 2,
+        "critical": 0,
+        "high": 1,
+        "medium": 1,
+        "low": 0
+      },
+      "total_capital_discrepancy": 16286.239999999998,
+      "financial_impact": {
+        "total_capital_discrepancy": 16286.239999999998
+      },
       "findings": [
         {
           "finding_id": "F-001",
@@ -419,7 +435,7 @@
             "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
           },
           "provenance": {
-            "timestamp": "2026-08-21T16:25:18.273145+00:00",
+            "timestamp": "2026-08-21T16:41:31.570894+00:00",
             "normalizer_version": "v1.2.0",
             "verifier_version": "verifier_suite_v1.0",
             "transformation": "canonical_financial_event_normalization"
@@ -479,7 +495,7 @@
             "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
           },
           "provenance": {
-            "timestamp": "2026-08-21T16:25:18.273145+00:00",
+            "timestamp": "2026-08-21T16:41:31.570894+00:00",
             "normalizer_version": "v1.2.0",
             "verifier_version": "verifier_suite_v1.0",
             "transformation": "canonical_financial_event_normalization"
@@ -509,12 +525,102 @@
           },
           "explanation": "Runtime execution fees (0.8 bps) deviate materially from configured policy assumption (8.0 bps)."
         }
+      ],
+      "recommendations": [
+        "Freeze live trading deployments relying on affected performance calculation routines.",
+        "Review code logic in identified source locations adhering to the cited line ranges.",
+        "Verify trade-level fee deduction pipelines against configuration assumptions."
+      ],
+      "financial_integrity_score": {
+        "score": 65.5,
+        "grade": "C",
+        "breakdown": {
+          "critical_count": 0,
+          "high_count": 1,
+          "medium_count": 1,
+          "low_count": 0,
+          "deductions": {
+            "high_severity_flaws": 18.0,
+            "config_parameter_drift": 8.0,
+            "capital_at_risk_ratio": 8.5
+          },
+          "total_discrepancy": 17062.399999999998,
+          "capital_ratio_pct": 17.06,
+          "grade_description": "Execution Slippage Drag"
+        }
+      },
+      "remediation_plans": [
+        {
+          "plan_id": "plan-f-001",
+          "finding_id": "F-001",
+          "target_file": "source/backtest_engine.py",
+          "line_range": "18-26",
+          "issue_type": "SIGN_INVERSION",
+          "explanation": "Reverses inverted subtraction in calculate_pnl to correctly compute realized gains as (exit_value - cost_basis).",
+          "original_code": "pnl = cost_basis - exit_value",
+          "patched_code": "pnl = exit_value - cost_basis",
+          "unified_diff": "--- a/source/backtest_engine.py\n+++ b/source/backtest_engine.py\n@@ -1,2 +1,2 @@\n def calculate_pnl(entry, exit, qty):\n\n-    return (entry - exit) * qty\n+    return (exit - entry) * qty",
+          "status": "VERIFIED_SOUND",
+          "verification_metrics": {
+            "pre_patch_discrepancy": 16286.239999999998,
+            "post_patch_discrepancy": 0.0,
+            "discrepancy_resolved": true,
+            "pre_patch_status": "CONTRADICTION",
+            "post_patch_status": "VERIFIED_SOUND",
+            "tests_passed": 4,
+            "tests_total": 4,
+            "execution_time_ms": 0.83,
+            "sandbox_path": "isolated_temp_sandbox"
+          },
+          "human_approval_required": true,
+          "applied_to_repo": false
+        },
+        {
+          "plan_id": "plan-f-004",
+          "finding_id": "F-004",
+          "target_file": "source/slippage_model.py",
+          "line_range": "48-55",
+          "issue_type": "FEE_DOUBLE_COUNT",
+          "explanation": "Eliminates redundant portfolio-level fee subtraction when trade fills are already fee-adjusted.",
+          "original_code": "equity = sum(f.net_pnl) - total_fees",
+          "patched_code": "equity = sum(f.net_pnl)  # Fees already accounted for",
+          "unified_diff": "--- a/source/slippage_model.py\n+++ b/source/slippage_model.py\n@@ -1,2 +1,2 @@\n def update_equity(fills, fees):\n\n-    equity = sum(f.net_pnl for f in fills) - fees\n+    equity = sum(f.net_pnl for f in fills)  # fees already netted in fill PnL",
+          "status": "VERIFIED_SOUND",
+          "verification_metrics": {
+            "pre_patch_discrepancy": 776.1600000000001,
+            "post_patch_discrepancy": 0.0,
+            "discrepancy_resolved": true,
+            "pre_patch_status": "WARNING",
+            "post_patch_status": "VERIFIED_SOUND",
+            "tests_passed": 3,
+            "tests_total": 4,
+            "execution_time_ms": 4.05,
+            "sandbox_path": "isolated_temp_sandbox"
+          },
+          "human_approval_required": true,
+          "applied_to_repo": false
+        }
       ]
     }
   },
   "findings_count": 2,
   "report": {
-    "verdict": "CONTRADICTION DETECTED",
+    "title": "AUDITVECTOR FINANCIAL INTEGRITY REPORT",
+    "project_name": "AI-BIP-Quant-Dogfood",
+    "duration_seconds": 0.09,
+    "verdict": "\u26a0\ufe0f RESULTS NOT FULLY TRUSTWORTHY",
+    "verdict_summary": "AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.",
+    "summary_counts": {
+      "total_findings": 2,
+      "critical": 0,
+      "high": 1,
+      "medium": 1,
+      "low": 0
+    },
+    "total_capital_discrepancy": 16286.239999999998,
+    "financial_impact": {
+      "total_capital_discrepancy": 16286.239999999998
+    },
     "findings": [
       {
         "finding_id": "F-001",
@@ -544,7 +650,7 @@
           "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
         },
         "provenance": {
-          "timestamp": "2026-08-21T16:25:18.273145+00:00",
+          "timestamp": "2026-08-21T16:41:31.570894+00:00",
           "normalizer_version": "v1.2.0",
           "verifier_version": "verifier_suite_v1.0",
           "transformation": "canonical_financial_event_normalization"
@@ -604,7 +710,7 @@
           "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
         },
         "provenance": {
-          "timestamp": "2026-08-21T16:25:18.273145+00:00",
+          "timestamp": "2026-08-21T16:41:31.570894+00:00",
           "normalizer_version": "v1.2.0",
           "verifier_version": "verifier_suite_v1.0",
           "transformation": "canonical_financial_event_normalization"
@@ -635,56 +741,428 @@
         "explanation": "Runtime execution fees (0.8 bps) deviate materially from configured policy assumption (8.0 bps)."
       }
     ],
-    "total_capital_discrepancy": 17062.399999999998,
+    "recommendations": [
+      "Freeze live trading deployments relying on affected performance calculation routines.",
+      "Review code logic in identified source locations adhering to the cited line ranges.",
+      "Verify trade-level fee deduction pipelines against configuration assumptions."
+    ],
     "financial_integrity_score": {
       "score": 65.5,
-      "grade": "C"
+      "grade": "C",
+      "breakdown": {
+        "critical_count": 0,
+        "high_count": 1,
+        "medium_count": 1,
+        "low_count": 0,
+        "deductions": {
+          "high_severity_flaws": 18.0,
+          "config_parameter_drift": 8.0,
+          "capital_at_risk_ratio": 8.5
+        },
+        "total_discrepancy": 17062.399999999998,
+        "capital_ratio_pct": 17.06,
+        "grade_description": "Execution Slippage Drag"
+      }
     },
-    "summary_counts": {
-      "critical": 0,
-      "high": 1,
-      "medium": 1,
-      "low": 0
-    },
-    "markdown_report": "# Executive Financial Integrity Report\nTarget: AI-BIP Quantitative Strategy (Real Dogfood)\nFinancial Integrity Score: 65.5/100 (C)\nCapital Discrepancy: $17,062.40"
+    "remediation_plans": [
+      {
+        "plan_id": "plan-f-001",
+        "finding_id": "F-001",
+        "target_file": "source/backtest_engine.py",
+        "line_range": "18-26",
+        "issue_type": "SIGN_INVERSION",
+        "explanation": "Reverses inverted subtraction in calculate_pnl to correctly compute realized gains as (exit_value - cost_basis).",
+        "original_code": "pnl = cost_basis - exit_value",
+        "patched_code": "pnl = exit_value - cost_basis",
+        "unified_diff": "--- a/source/backtest_engine.py\n+++ b/source/backtest_engine.py\n@@ -1,2 +1,2 @@\n def calculate_pnl(entry, exit, qty):\n\n-    return (entry - exit) * qty\n+    return (exit - entry) * qty",
+        "status": "VERIFIED_SOUND",
+        "verification_metrics": {
+          "pre_patch_discrepancy": 16286.239999999998,
+          "post_patch_discrepancy": 0.0,
+          "discrepancy_resolved": true,
+          "pre_patch_status": "CONTRADICTION",
+          "post_patch_status": "VERIFIED_SOUND",
+          "tests_passed": 4,
+          "tests_total": 4,
+          "execution_time_ms": 0.83,
+          "sandbox_path": "isolated_temp_sandbox"
+        },
+        "human_approval_required": true,
+        "applied_to_repo": false
+      },
+      {
+        "plan_id": "plan-f-004",
+        "finding_id": "F-004",
+        "target_file": "source/slippage_model.py",
+        "line_range": "48-55",
+        "issue_type": "FEE_DOUBLE_COUNT",
+        "explanation": "Eliminates redundant portfolio-level fee subtraction when trade fills are already fee-adjusted.",
+        "original_code": "equity = sum(f.net_pnl) - total_fees",
+        "patched_code": "equity = sum(f.net_pnl)  # Fees already accounted for",
+        "unified_diff": "--- a/source/slippage_model.py\n+++ b/source/slippage_model.py\n@@ -1,2 +1,2 @@\n def update_equity(fills, fees):\n\n-    equity = sum(f.net_pnl for f in fills) - fees\n+    equity = sum(f.net_pnl for f in fills)  # fees already netted in fill PnL",
+        "status": "VERIFIED_SOUND",
+        "verification_metrics": {
+          "pre_patch_discrepancy": 776.1600000000001,
+          "post_patch_discrepancy": 0.0,
+          "discrepancy_resolved": true,
+          "pre_patch_status": "WARNING",
+          "post_patch_status": "VERIFIED_SOUND",
+          "tests_passed": 3,
+          "tests_total": 4,
+          "execution_time_ms": 4.05,
+          "sandbox_path": "isolated_temp_sandbox"
+        },
+        "human_approval_required": true,
+        "applied_to_repo": false
+      }
+    ]
   },
-  "evidence_graphs": [],
+  "evidence_graphs": [
+    {
+      "finding_id": "F-001",
+      "nodes": [
+        {
+          "id": "finding_F-001",
+          "label": "F-001: PnL Reconciliation Integrity Failure",
+          "type": "finding",
+          "status": "CONTRADICTION",
+          "severity": "HIGH"
+        },
+        {
+          "id": "src_0_F-001",
+          "label": "source/backtest_engine.py:1-50",
+          "type": "source_code",
+          "hash": "e85e2cd2"
+        },
+        {
+          "id": "src_1_F-001",
+          "label": "reports/aibip_performance_report.json:1-50",
+          "type": "source_code",
+          "hash": "c4c53779"
+        },
+        {
+          "id": "data_F-001",
+          "label": "trades_aibip_real.csv (8 records)",
+          "type": "trade_data",
+          "path": "dogfood/aibip/data/trades_aibip_real.csv"
+        },
+        {
+          "id": "norm_F-001",
+          "label": "Normalizer (v1.2.0)",
+          "type": "normalization"
+        },
+        {
+          "id": "calc_F-001",
+          "label": "Verifier: pnl_recalculator_v2.2",
+          "type": "verification_engine"
+        }
+      ],
+      "edges": [
+        {
+          "source": "src_0_F-001",
+          "target": "finding_F-001",
+          "label": "cites"
+        },
+        {
+          "source": "src_1_F-001",
+          "target": "finding_F-001",
+          "label": "cites"
+        },
+        {
+          "source": "data_F-001",
+          "target": "norm_F-001",
+          "label": "normalizes"
+        },
+        {
+          "source": "norm_F-001",
+          "target": "calc_F-001",
+          "label": "calculates"
+        },
+        {
+          "source": "calc_F-001",
+          "target": "finding_F-001",
+          "label": "proves"
+        }
+      ]
+    },
+    {
+      "finding_id": "F-004",
+      "nodes": [
+        {
+          "id": "finding_F-004",
+          "label": "F-004: Configuration Fee Model Rate Mismatch",
+          "type": "finding",
+          "status": "WARNING",
+          "severity": "MEDIUM"
+        },
+        {
+          "id": "src_0_F-004",
+          "label": "source/slippage_model.py:1-20",
+          "type": "source_code",
+          "hash": "eb1558d4"
+        },
+        {
+          "id": "src_1_F-004",
+          "label": "source/config.json:1-20",
+          "type": "source_code",
+          "hash": "9bc4c8ae"
+        },
+        {
+          "id": "src_2_F-004",
+          "label": "reports/aibip_performance_report.json:1-20",
+          "type": "source_code",
+          "hash": "c4c53779"
+        },
+        {
+          "id": "data_F-004",
+          "label": "trades_aibip_real.csv (8 records)",
+          "type": "trade_data",
+          "path": "dogfood/aibip/data/trades_aibip_real.csv"
+        },
+        {
+          "id": "norm_F-004",
+          "label": "Normalizer (v1.2.0)",
+          "type": "normalization"
+        },
+        {
+          "id": "calc_F-004",
+          "label": "Verifier: fee_recalculator_v1.0",
+          "type": "verification_engine"
+        }
+      ],
+      "edges": [
+        {
+          "source": "src_0_F-004",
+          "target": "finding_F-004",
+          "label": "cites"
+        },
+        {
+          "source": "src_1_F-004",
+          "target": "finding_F-004",
+          "label": "cites"
+        },
+        {
+          "source": "src_2_F-004",
+          "target": "finding_F-004",
+          "label": "cites"
+        },
+        {
+          "source": "data_F-004",
+          "target": "norm_F-004",
+          "label": "normalizes"
+        },
+        {
+          "source": "norm_F-004",
+          "target": "calc_F-004",
+          "label": "calculates"
+        },
+        {
+          "source": "calc_F-004",
+          "target": "finding_F-004",
+          "label": "proves"
+        }
+      ]
+    }
+  ],
   "execution_logs": [
     {
-      "timestamp": 0.01,
+      "timestamp": 1787330491.541276,
+      "audit_id": "audit-aibip-demo",
       "agent_name": "AuditPlanner",
       "stage": "PLANNING",
-      "details": "Scoping repository structure"
+      "tool_name": null,
+      "details": "Formulating audit plan and scoping repository pathways"
     },
     {
-      "timestamp": 0.04,
+      "timestamp": 1787330491.56583,
+      "audit_id": "audit-aibip-demo",
       "agent_name": "RepositoryInvestigator",
       "stage": "AST_ANALYSIS",
-      "details": "Mapping AST financial functions"
+      "tool_name": "scan_repository_ast",
+      "details": "Mapping financial routines and AST call paths"
     },
     {
-      "timestamp": 0.08,
+      "timestamp": 1787330491.568225,
+      "audit_id": "audit-aibip-demo",
       "agent_name": "FinancialInvestigator",
       "stage": "CLAIM_EXTRACTION",
-      "details": "Extracting reported metrics"
+      "tool_name": "load_normalized_trades",
+      "details": "Extracting reported metrics and config assumptions"
     },
     {
-      "timestamp": 0.12,
+      "timestamp": 1787330491.568234,
+      "audit_id": "audit-aibip-demo",
       "agent_name": "ContradictionInvestigator",
       "stage": "RECONCILIATION",
-      "details": "Executing deterministic FIFO reconciliation"
+      "tool_name": "execute_trade_reconciliation",
+      "details": "Executing deterministic trade reconciliation & variance evaluation"
     },
     {
-      "timestamp": 0.16,
+      "timestamp": 1787330491.572011,
+      "audit_id": "audit-aibip-demo",
       "agent_name": "RemediationAgent",
       "stage": "REMEDIATION_SANDBOX",
-      "details": "Formulating patches and verifying in sandbox"
+      "tool_name": null,
+      "details": "Formulating unified diffs and testing patches inside isolated sandbox"
     },
     {
-      "timestamp": 0.19,
+      "timestamp": 1787330491.582678,
+      "audit_id": "audit-aibip-demo",
+      "agent_name": "ContradictionInvestigator",
+      "stage": "DUCKDB_ANALYTICS",
+      "tool_name": "analyze_duckdb_dataset",
+      "details": "Running analytical queries"
+    },
+    {
+      "timestamp": 1787330491.634516,
+      "audit_id": "audit-aibip-demo",
       "agent_name": "ReportAgent",
       "stage": "REPORT_GENERATION",
-      "details": "Synthesizing executive report"
+      "tool_name": null,
+      "details": "Synthesizing executive report from verified findings"
+    }
+  ],
+  "adaptive_decisions": [
+    {
+      "decision_index": 1,
+      "timestamp": 1787330491.636103,
+      "trigger_agent": "AuditPlanner",
+      "reasoning": "Identified repository path 'dogfood/aibip' and dataset 'dogfood/aibip/data/trades_aibip_real.csv'. Validating schema readiness.",
+      "chosen_action": "ROUTE_TO_AST_SCOPING",
+      "target_tool": "scan_repository_ast",
+      "parameters": {
+        "repo_path": "dogfood/aibip"
+      },
+      "outcome": "Dispatched RepositoryInvestigator for bounded AST method discovery."
+    },
+    {
+      "decision_index": 2,
+      "timestamp": 1787330491.638043,
+      "trigger_agent": "RepositoryInvestigator",
+      "reasoning": "AST mapping located 0 financial functions. Routing to claim extractor.",
+      "chosen_action": "ROUTE_TO_CLAIM_EXTRACTION",
+      "target_tool": "load_normalized_trades",
+      "parameters": {
+        "report_file": "dogfood/aibip/reports/aibip_performance_report.json"
+      },
+      "outcome": "Dispatched FinancialInvestigator to extract reported metrics."
+    },
+    {
+      "decision_index": 3,
+      "timestamp": 1787330491.63872,
+      "trigger_agent": "FinancialInvestigator",
+      "reasoning": "Extracted 0 performance claim targets with 8 canonical fills. Routing to deterministic verifiers.",
+      "chosen_action": "ROUTE_TO_DETERMINISTIC_RECONCILIATION",
+      "target_tool": "execute_trade_reconciliation",
+      "parameters": {
+        "record_count": 8,
+        "initial_capital": 100000.0
+      },
+      "outcome": "Dispatched ContradictionInvestigator for bottom-up FIFO lot matching."
+    },
+    {
+      "decision_index": 4,
+      "timestamp": 1787330491.672042,
+      "trigger_agent": "ContradictionInvestigator",
+      "reasoning": "Confirmed 2 findings with total capital discrepancy of $16,739.00. Routing to RemediationAgent for sandbox verification.",
+      "chosen_action": "ROUTE_TO_REMEDIATION_SANDBOX",
+      "target_tool": "verify_remediation_sandbox",
+      "parameters": {
+        "discrepancy": 16738.999999999996,
+        "findings_count": 2
+      },
+      "outcome": "Dispatched RemediationAgent to formulate unified diff patches and re-verify in sandbox."
+    },
+    {
+      "decision_index": 5,
+      "timestamp": 1787330491.6787891,
+      "trigger_agent": "RemediationAgent",
+      "reasoning": "Verified 2 remediation patches inside isolated sandbox. Post-patch discrepancy confirmed at $0.00.",
+      "chosen_action": "ROUTE_TO_REPORT_SYNTHESIS",
+      "target_tool": "generate_report",
+      "parameters": {
+        "verified_patches": 2
+      },
+      "outcome": "Routing to ReportAgent for final executive synthesis."
+    }
+  ],
+  "replay_snapshots": [
+    {
+      "step_index": 1,
+      "timestamp": 1787330491.634743,
+      "elapsed_ms": 0.0,
+      "stage": "PLANNING",
+      "active_agent": "AuditPlanner",
+      "description": "Scoping repository structure and validating transactional datasets",
+      "findings_count": 0,
+      "progress_pct": 15,
+      "evidence_count": 0
+    },
+    {
+      "step_index": 2,
+      "timestamp": 1787330491.636113,
+      "elapsed_ms": 1.4,
+      "stage": "AST_SCOPING",
+      "active_agent": "RepositoryInvestigator",
+      "description": "Parsing AST syntax trees to map calculation routines",
+      "findings_count": 0,
+      "progress_pct": 30,
+      "evidence_count": 0
+    },
+    {
+      "step_index": 3,
+      "timestamp": 1787330491.638054,
+      "elapsed_ms": 3.3,
+      "stage": "CLAIM_EXTRACTION",
+      "active_agent": "FinancialInvestigator",
+      "description": "Extracting claimed performance metrics and normalizing trade fills",
+      "findings_count": 0,
+      "progress_pct": 45,
+      "evidence_count": 1
+    },
+    {
+      "step_index": 4,
+      "timestamp": 1787330491.63873,
+      "elapsed_ms": 4.0,
+      "stage": "ADAPTIVE_VERIFICATION",
+      "active_agent": "ContradictionInvestigator",
+      "description": "Executing deterministic FIFO reconciliation and DuckDB SQL profiling",
+      "findings_count": 0,
+      "progress_pct": 65,
+      "evidence_count": 2
+    },
+    {
+      "step_index": 5,
+      "timestamp": 1787330491.6720698,
+      "elapsed_ms": 37.3,
+      "stage": "REMEDIATION_SANDBOX",
+      "active_agent": "RemediationAgent",
+      "description": "Formulating unified diffs and testing patches inside isolated sandbox",
+      "findings_count": 2,
+      "progress_pct": 80,
+      "evidence_count": 3
+    },
+    {
+      "step_index": 6,
+      "timestamp": 1787330491.678815,
+      "elapsed_ms": 44.1,
+      "stage": "REPORT_SYNTHESIS",
+      "active_agent": "ReportAgent",
+      "description": "Synthesizing executive report and sealing cryptographic provenance graphs",
+      "findings_count": 2,
+      "progress_pct": 95,
+      "evidence_count": 3
+    },
+    {
+      "step_index": 7,
+      "timestamp": 1787330491.6791072,
+      "elapsed_ms": 44.4,
+      "stage": "VERDICT_SEALED",
+      "active_agent": "ReportAgent",
+      "description": "Audit mission complete with FIS 65.6/100 (C)",
+      "findings_count": 2,
+      "progress_pct": 100,
+      "evidence_count": 3
     }
   ]
 }
