@@ -9,7 +9,7 @@ from backend.models.finding import (
     ProvenanceMetadata,
     CalculationVariance
 )
-from backend.models.remediation import PatchStatus
+from backend.models.remediation import PatchStatus, RemediationPlan
 from backend.models.financial_event import FinancialEvent
 from backend.remediation.patch_generator import PatchGenerator
 from backend.remediation.sandbox import RemediationSandbox
@@ -71,6 +71,29 @@ class TestRemediationSandbox(unittest.TestCase):
         self.assertEqual(verified_plan.verification_metrics.post_patch_discrepancy, 0.0)
         self.assertTrue(verified_plan.verification_metrics.discrepancy_resolved)
         self.assertGreater(verified_plan.verification_metrics.tests_passed, 0)
+
+    def test_negative_remediation_bad_patch_rejected_by_sandbox(self):
+        bad_plan = RemediationPlan(
+            plan_id="plan-bad-test",
+            finding_id="F-001",
+            target_file="strategy_alpha.py",
+            line_range="18-26",
+            issue_type="SIGN_INVERSION",
+            explanation="Flawed patch that preserves inverted formula",
+            original_code="cost_basis - exit_value",
+            patched_code="def calculate_pnl():\n    return cost_basis - exit_value  # Still broken",
+            unified_diff="--- a/strategy_alpha.py\n+++ b/strategy_alpha.py",
+            status=PatchStatus.PENDING
+        )
+        verified_bad_plan = RemediationSandbox.verify_patch(
+            plan=bad_plan,
+            finding=self.finding_pnl,
+            events=self.sample_events,
+            initial_capital=100_000.0
+        )
+        self.assertEqual(verified_bad_plan.status, PatchStatus.REGRESSION_FAILED)
+        self.assertFalse(verified_bad_plan.verification_metrics.discrepancy_resolved)
+        self.assertGreater(verified_bad_plan.verification_metrics.post_patch_discrepancy, 0.0)
 
     def test_patch_application_blocked_without_human_authorization(self):
         plan = PatchGenerator.generate_patch_for_finding(self.finding_pnl, "integritylab/source")
