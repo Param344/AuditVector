@@ -157,17 +157,122 @@ GCP_PROJECT_ID="your-project-id" ./deploy_cloudrun.sh
 
 ---
 
-## 🧪 6. Comprehensive Test Suite
+## 🔬 6. Reproducible Testing & Verification Guide
 
-Run the full 55-test suite and master verification:
+AuditVector is engineered for **100% hermetic reproducibility**. Judges and auditors can verify the entire test suite, benchmark suite, and forensic calculations in under 2 seconds without requiring external API keys or cloud credentials (defaults to `OFFLINE_DETERMINISTIC` mode).
+
+---
+
+### ⚡ Method 1: Single-Command Master Verification (Recommended)
+
+Run the master verification script, which executes all 55 automated tests followed by autonomous audits across all three benchmarks:
 
 ```bash
-# Run unit and integration tests
-.venv/bin/python -m unittest discover -s tests -p "test_*.py" -v
-
-# Run end-to-end master verification
+# Execute master test & benchmark verification suite
 ./verify_all.sh
 ```
+
+**Expected Console Output:**
+```text
+============================================================
+ 🛡️ AUDITVECTOR — MASTER VERIFICATION & FORENSIC AUDIT SUITE
+ Track: Taskmaster | Google ADK 2.7 + Gemini 3.5+ + DuckDB
+ Tagline: AI reasons. Code proves. Evidence explains.
+============================================================
+
+[1/4] Running Complete 55-Test Verification Suite...
+Ran 55 tests in 1.680s — OK
+
+[2/4] Executing Autonomous Audit on IntegrityLab Alpha...
+Verdict: ⚠️ RESULTS NOT FULLY TRUSTWORTHY
+Total Capital Discrepancy: $44,140.00 (4 Contradictions Confirmed)
+
+[3/4] Executing Autonomous Audit on IntegrityLab Control...
+Verdict: ✅ FINANCIAL INTEGRITY VERIFIED
+Total Capital Discrepancy: $0.00 (100% Sound, 0 False Positives)
+
+[4/4] Executing Autonomous Audit on Real-World AI-BIP Dogfood...
+Verdict: ⚠️ RESULTS NOT FULLY TRUSTWORTHY
+Total Capital Discrepancy: $16,286.24 (Slippage Drag Identified)
+
+============================================================
+ ✅ ALL AUDITVECTOR SUBSYSTEMS 100% OPERATIONAL & VERIFIED
+============================================================
+```
+
+---
+
+### 🧪 Method 2: Comprehensive 55-Test Automated Suite
+
+Run the full automated test suite covering ADK agents, deterministic math verifiers, FastAPI endpoints, Cloud Run pubsub push workers, and secret redactors:
+
+```bash
+# Run all 55 unit and integration tests
+.venv/bin/python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+| Subsystem Tested | Test File | Test Count | Expected Status |
+| :--- | :--- | :---: | :---: |
+| **Official Google ADK 2.7 Agents** | `test_adk_runner.py` | 3 | `3/3 PASS` |
+| **Deterministic Tool Wrappers** | `test_adk_tools.py` | 6 | `6/6 PASS` |
+| **FIFO PnL Recalculator (Long/Short)** | `test_pnl_recalculator.py` | 6 | `6/6 PASS` |
+| **Return Polarity Inversion Detector** | `test_return_calculator.py` | 2 | `2/2 PASS` |
+| **Fee Double-Count Recalculator** | `test_fee_recalculator.py` | 1 | `1/1 PASS` |
+| **Comparison & Tolerance Engine** | `test_comparison.py` | 5 | `5/5 PASS` |
+| **DuckDB In-Memory SQL Engine** | `test_duckdb_engine.py` | 1 | `1/1 PASS` |
+| **Evidence Contract Gatekeeper** | `test_evidence_contract.py` | 2 | `2/2 PASS` |
+| **Secret Redaction (Private Keys/API)** | `test_secret_redactor.py` | 3 | `3/3 PASS` |
+| **IntegrityLab Benchmarks (Alpha & Control)** | `test_integritylab_audit.py` | 2 | `2/2 PASS` |
+| **AI-BIP Real Quantitative Dogfood** | `test_aibip_dogfood.py` | 2 | `2/2 PASS` |
+| **FastAPI REST Endpoints & 404/422** | `test_audit_api.py` | 7 | `7/7 PASS` |
+| **Cloud Run & Pub/Sub Push Webhook** | `test_cloud_runtime.py` | 5 | `5/5 PASS` |
+| **Static UI Serving (`/`, CSS, JS)** | `test_frontend_serving.py` | 3 | `3/3 PASS` |
+| **Ingestion Normalizer & Aliasing** | `test_normalizer.py` | 3 | `3/3 PASS` |
+| **AST Repository Keyword Mapper** | `test_repository_investigator.py` | 1 | `1/1 PASS` |
+| **Financial Claim Target Extractor** | `test_financial_investigator.py` | 1 | `1/1 PASS` |
+| **Settings & Gemini 3.5 Config** | `test_settings_config.py` | 2 | `2/2 PASS` |
+| **TOTAL** | **17 Test Modules** | **55** | **`55/55 PASS` (100%)** |
+
+---
+
+### 💻 Method 3: Direct CLI Benchmark Execution
+
+Execute each benchmark scenario individually from the command line:
+
+```bash
+# 1. Audit IntegrityLab Alpha (Confirms 4 planted flaws: PnL inversion, polarity, fees)
+./run_audit.sh --demo alpha
+
+# 2. Audit IntegrityLab Control (Proves clean baseline: $0.00 discrepancy, 0 hallucinations)
+./run_audit.sh --demo control
+
+# 3. Audit Real-World AI-BIP Quantitative Strategy (Uncovers $16,286.24 slippage drag)
+./run_audit.sh --demo aibip
+
+# 4. Audit Any Custom Repository & Dataset
+./run_audit.sh --repo integritylab/source \
+               --data integritylab/data/trades_alpha_failure.csv \
+               --report integritylab/reports/alpha_performance_report.json \
+               --fee-bps 5.0
+```
+
+---
+
+### 🌐 Method 4: Interactive Web UI Verification
+
+1. Start the local server:
+   ```bash
+   uvicorn backend.api.server:app --host 0.0.0.0 --port 8000
+   ```
+2. Open **[http://localhost:8000](http://localhost:8000)** in your browser.
+3. Click **"START AUDIT"** on **IntegrityLab Alpha**.
+   * *Verify:* Active 5-agent ADK stepper transitions from `AuditPlanner` $\to$ `ReportAgent`.
+   * *Verify:* Real-time streaming telemetry event log updates.
+   * *Verify:* Final Verdict shows **$44,140.00** discrepancy with side-by-side **Claim vs. Reality** comparison (`+$18,240.00` claimed vs `-$3,720.00` reconstructed).
+   * *Verify:* Click **"Inspect Evidence Contract"** on finding `F-001` to view source code line citations and SHA-256 hashes.
+   * *Verify:* Switch to **"Interactive Evidence Graph"** tab to view node-and-edge provenance chains.
+4. Click **"+ New Audit"** and run **IntegrityLab Control**.
+   * *Verify:* Screen switches to emerald green **FINANCIAL INTEGRITY VERIFIED** with **$0.00 discrepancy**.
 
 ---
 
