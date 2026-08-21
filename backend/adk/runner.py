@@ -1,7 +1,7 @@
 """Google ADK Multi-Agent Orchestration Runner.
 
-Orchestrates the 5-agent pipeline with Gemini model reasoning and deterministic tool bindings,
-while providing an offline test mode for hermetic local execution.
+Orchestrates the 6-agent pipeline with Gemini model reasoning, adaptive routing,
+sandbox remediation, and deterministic verification.
 """
 
 import time
@@ -12,7 +12,7 @@ from ..config.settings import settings
 from ..evidence.evidence_store import EvidenceStore
 from ..evidence.evidence_graph import EvidenceGraph
 from ..models.finding import Finding
-from .agents import FIVE_ADK_AGENTS
+from .agents import FIVE_ADK_AGENTS, ADK_AGENTS
 from .tools import (
     sanitize_text,
     scan_repository_ast,
@@ -25,9 +25,12 @@ from ..agents.audit_planner import AuditPlanner
 from ..agents.repository_investigator import RepositoryInvestigator
 from ..agents.financial_investigator import FinancialInvestigator
 from ..agents.contradiction_investigator import ContradictionInvestigator
+from ..agents.remediation_agent import RemediationAgent
 from ..agents.report_agent import ReportAgent
+from ..verification.integrity_score import FinancialIntegrityScoreCalculator
+from ..ingestion.csv import CSVIngestionAdapter
+from .orchestrator import AdaptiveAuditOrchestrator
 
-# Structured logger
 logger = logging.getLogger("AuditVector.ADK")
 
 
@@ -55,7 +58,7 @@ class ADKSession:
 
 
 class ADKRunner:
-    """Orchestrates the 5 Google ADK agents through the complete audit lifecycle."""
+    """Orchestrates the Google ADK agents through the complete adaptive audit lifecycle."""
 
     @classmethod
     def run_audit(
@@ -116,7 +119,30 @@ class ADKRunner:
         )
         session.agent_outputs["contradiction_investigator"] = [f.to_dict() for f in findings]
 
-        # Optional: Run DuckDB fast analytics for dataset validation
+        # Load events for sandbox verification
+        events = []
+        try:
+            events = CSVIngestionAdapter.parse_csv_file(data_file)
+        except Exception:
+            pass
+
+        # -------------------------------------------------------------
+        # STEP 5: REMEDIATION AGENT (Autonomous Sandbox Verification)
+        # -------------------------------------------------------------
+        session.log_event(
+            "RemediationAgent",
+            "REMEDIATION_SANDBOX",
+            "Formulating unified diffs and testing patches inside isolated sandbox"
+        )
+        remediation_plans = RemediationAgent.generate_and_verify_remediations(
+            findings=findings,
+            repo_path=repo_path,
+            events=events,
+            initial_capital=initial_capital
+        )
+        session.agent_outputs["remediation_agent"] = [p.to_dict() for p in remediation_plans]
+
+        # DuckDB fast analytics for dataset validation
         session.log_event("ContradictionInvestigator", "DUCKDB_ANALYTICS", "Running analytical queries", tool_name="analyze_duckdb_dataset")
         try:
             duckdb_res = analyze_duckdb_dataset(data_file)
@@ -125,7 +151,7 @@ class ADKRunner:
             pass
 
         # -------------------------------------------------------------
-        # STEP 5: REPORT AGENT (Executive Synthesis)
+        # STEP 6: REPORT AGENT (Executive Synthesis & FIS Scoring)
         # -------------------------------------------------------------
         session.log_event("ReportAgent", "REPORT_GENERATION", "Synthesizing executive report from verified findings")
         duration = round(time.time() - session.start_time, 2)
@@ -135,6 +161,20 @@ class ADKRunner:
             evidence_store=session.evidence_store,
             duration_seconds=duration
         )
+
+        total_discrepancy = sum(f.capital_at_risk for f in findings)
+        fis_score, fis_grade, fis_breakdown = FinancialIntegrityScoreCalculator.calculate(
+            findings=findings,
+            initial_capital=initial_capital,
+            total_discrepancy=total_discrepancy
+        )
+
+        report_output["financial_integrity_score"] = {
+            "score": fis_score,
+            "grade": fis_grade,
+            "breakdown": fis_breakdown
+        }
+        report_output["remediation_plans"] = session.agent_outputs["remediation_agent"]
         session.agent_outputs["report_agent"] = report_output
 
         # Generate Evidence Graphs
@@ -147,11 +187,15 @@ class ADKRunner:
             "mode": mode,
             "gemini_model": settings.GEMINI_MODEL,
             "duration_seconds": duration,
+            "financial_integrity_score": fis_score,
+            "integrity_grade": fis_grade,
+            "remediation_plans": session.agent_outputs["remediation_agent"],
             "agent_pipeline": {
                 "planner": session.agent_outputs.get("planner"),
                 "repository_investigator": session.agent_outputs.get("repository_investigator"),
                 "financial_investigator": session.agent_outputs.get("financial_investigator"),
                 "contradiction_investigator": session.agent_outputs.get("contradiction_investigator"),
+                "remediation_agent": session.agent_outputs.get("remediation_agent"),
                 "report_agent": session.agent_outputs.get("report_agent")
             },
             "findings_count": len(findings),

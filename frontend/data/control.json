@@ -1,169 +1,146 @@
 {
   "status": "COMPLETED",
-  "audit_id": "audit-control-demo",
-  "project_name": "IntegrityLab-Control",
+  "audit_id": "mission-demo-control",
+  "project_name": "IntegrityLab-Control (Clean Baseline)",
   "mode": "OFFLINE_DETERMINISTIC",
   "gemini_model": "gemini-3.5-flash",
-  "duration_seconds": 0.08,
+  "duration_seconds": 0.04,
+  "financial_integrity_score": {
+    "score": 100.0,
+    "grade": "A+"
+  },
+  "remediation_plans": [],
+  "adaptive_decisions": [
+    {
+      "decision_index": 1,
+      "timestamp": 1787329518.2077289,
+      "trigger_agent": "AuditPlanner",
+      "reasoning": "Identified repository path 'integritylab/source' and dataset 'integritylab/data/trades_control_case.csv'. Validating schema readiness.",
+      "chosen_action": "ROUTE_TO_AST_SCOPING",
+      "target_tool": "scan_repository_ast",
+      "parameters": {
+        "repo_path": "integritylab/source"
+      },
+      "outcome": "Dispatched RepositoryInvestigator for bounded AST method discovery."
+    },
+    {
+      "decision_index": 2,
+      "timestamp": 1787329518.209256,
+      "trigger_agent": "RepositoryInvestigator",
+      "reasoning": "AST mapping located 0 financial functions. Routing to claim extractor.",
+      "chosen_action": "ROUTE_TO_CLAIM_EXTRACTION",
+      "target_tool": "load_normalized_trades",
+      "parameters": {
+        "report_file": "integritylab/reports/control_performance_report.json"
+      },
+      "outcome": "Dispatched FinancialInvestigator to extract reported metrics."
+    },
+    {
+      "decision_index": 3,
+      "timestamp": 1787329518.212785,
+      "trigger_agent": "FinancialInvestigator",
+      "reasoning": "Extracted 0 performance claim targets with 2 canonical fills. Routing to deterministic verifiers.",
+      "chosen_action": "ROUTE_TO_DETERMINISTIC_RECONCILIATION",
+      "target_tool": "execute_trade_reconciliation",
+      "parameters": {
+        "record_count": 2,
+        "initial_capital": 100000.0
+      },
+      "outcome": "Dispatched ContradictionInvestigator for bottom-up FIFO lot matching."
+    },
+    {
+      "decision_index": 4,
+      "timestamp": 1787329518.2477272,
+      "trigger_agent": "ContradictionInvestigator",
+      "reasoning": "Deterministic recalculation exactly matches reported claims ($0.00 discrepancy). Zero hallucinations detected.",
+      "chosen_action": "ROUTE_TO_REPORT_AGENT",
+      "target_tool": "generate_report",
+      "parameters": {
+        "status": "VERIFIED_SOUND"
+      },
+      "outcome": "Proceeding directly to ReportAgent for sound verdict synthesis."
+    }
+  ],
+  "replay_snapshots": [
+    {
+      "step_index": 1,
+      "timestamp": 1787329518.206914,
+      "elapsed_ms": 0.0,
+      "stage": "PLANNING",
+      "active_agent": "AuditPlanner",
+      "description": "Scoping repository structure and validating transactional datasets",
+      "findings_count": 0,
+      "progress_pct": 15,
+      "evidence_count": 0
+    },
+    {
+      "step_index": 2,
+      "timestamp": 1787329518.2077389,
+      "elapsed_ms": 0.9,
+      "stage": "AST_SCOPING",
+      "active_agent": "RepositoryInvestigator",
+      "description": "Parsing AST syntax trees to map calculation routines",
+      "findings_count": 0,
+      "progress_pct": 30,
+      "evidence_count": 0
+    },
+    {
+      "step_index": 3,
+      "timestamp": 1787329518.209267,
+      "elapsed_ms": 2.4,
+      "stage": "CLAIM_EXTRACTION",
+      "active_agent": "FinancialInvestigator",
+      "description": "Extracting claimed performance metrics and normalizing trade fills",
+      "findings_count": 0,
+      "progress_pct": 45,
+      "evidence_count": 1
+    },
+    {
+      "step_index": 4,
+      "timestamp": 1787329518.212802,
+      "elapsed_ms": 5.9,
+      "stage": "ADAPTIVE_VERIFICATION",
+      "active_agent": "ContradictionInvestigator",
+      "description": "Executing deterministic FIFO reconciliation and DuckDB SQL profiling",
+      "findings_count": 0,
+      "progress_pct": 65,
+      "evidence_count": 2
+    },
+    {
+      "step_index": 5,
+      "timestamp": 1787329518.2477398,
+      "elapsed_ms": 40.9,
+      "stage": "REPORT_SYNTHESIS",
+      "active_agent": "ReportAgent",
+      "description": "Synthesizing executive report and sealing cryptographic provenance graphs",
+      "findings_count": 1,
+      "progress_pct": 95,
+      "evidence_count": 3
+    },
+    {
+      "step_index": 6,
+      "timestamp": 1787329518.247864,
+      "elapsed_ms": 41.0,
+      "stage": "VERDICT_SEALED",
+      "active_agent": "ReportAgent",
+      "description": "Audit mission complete with FIS 100.0/100 (A+)",
+      "findings_count": 1,
+      "progress_pct": 100,
+      "evidence_count": 3
+    }
+  ],
   "agent_pipeline": {
     "planner": {
-      "repo_scan": {
-        "total_files": 4,
-        "financial_modules": [
-          "config.json",
-          "fee_engine.py",
-          "control_strategy.py",
-          "strategy_alpha.py"
-        ],
-        "files": {
-          "config.json": {
-            "path": "config.json",
-            "abs_path": "integritylab/source/config.json",
-            "hash": "47cd7e903eb0267583dd31b45e9e6d44350730477a44f4682bcfa3864fccec35",
-            "line_count": 14,
-            "keywords": [
-              "fee",
-              "drawdown"
-            ],
-            "is_financial": true
-          },
-          "fee_engine.py": {
-            "path": "fee_engine.py",
-            "abs_path": "integritylab/source/fee_engine.py",
-            "hash": "fde94406e97da470f149c295ef85392156b34129775a5e967fd01553ed4184ff",
-            "line_count": 21,
-            "keywords": [
-              "pnl",
-              "fee",
-              "return",
-              "trade",
-              "equity"
-            ],
-            "is_financial": true
-          },
-          "control_strategy.py": {
-            "path": "control_strategy.py",
-            "abs_path": "integritylab/source/control_strategy.py",
-            "hash": "2f98fb9e6d904395e6b368ea91c60bfdbe23f2d33a3a4f97eda3ed9c1611f6f4",
-            "line_count": 20,
-            "keywords": [
-              "pnl",
-              "profit",
-              "fee",
-              "return",
-              "trade"
-            ],
-            "is_financial": true
-          },
-          "strategy_alpha.py": {
-            "path": "strategy_alpha.py",
-            "abs_path": "integritylab/source/strategy_alpha.py",
-            "hash": "7d01ae323f1a76e66ae3a6c27326baf198ef645a20b0bad2f368b9457177a8a7",
-            "line_count": 26,
-            "keywords": [
-              "pnl",
-              "profit",
-              "loss",
-              "return"
-            ],
-            "is_financial": true
-          }
-        }
-      },
-      "data_path": "integritylab/data/trades_control_case.csv",
-      "report_path": "integritylab/reports/control_performance_report.json",
-      "audit_plan": [
-        {
-          "step": 1,
-          "task": "Redact secrets from discovered source and config files",
-          "status": "PLANNED"
-        },
-        {
-          "step": 2,
-          "task": "Ingest and normalize raw trade event datasets to Canonical FinancialEvent model",
-          "status": "PLANNED"
-        },
-        {
-          "step": 3,
-          "task": "Map financial calculation pathways in discovered code modules",
-          "modules": [
-            "config.json",
-            "fee_engine.py",
-            "control_strategy.py",
-            "strategy_alpha.py"
-          ],
-          "status": "PLANNED"
-        },
-        {
-          "step": 4,
-          "task": "Execute bottom-up deterministic PnL reconstruction",
-          "status": "PLANNED"
-        },
-        {
-          "step": 5,
-          "task": "Analyze fee accounting for double-counting and model rate variances",
-          "status": "PLANNED"
-        },
-        {
-          "step": 6,
-          "task": "Evaluate return calculation polarity and sign consistency",
-          "status": "PLANNED"
-        },
-        {
-          "step": 7,
-          "task": "Cross-reconcile reported performance claims against deterministic truth",
-          "status": "PLANNED"
-        },
-        {
-          "step": 8,
-          "task": "Formulate Evidence Contracts for verified findings",
-          "status": "PLANNED"
-        },
-        {
-          "step": 9,
-          "task": "Generate executive financial integrity audit report",
-          "status": "PLANNED"
-        }
-      ]
+      "repo_path": "integritylab/source"
     },
     "repository_investigator": {
-      "total_mapped_modules": 3,
-      "modules": {
-        "fee_engine.py": {
-          "functions": [
-            "calculate_trade_fee",
-            "calculate_ending_equity"
-          ],
-          "keywords": [
-            "fee",
-            "trade"
-          ],
-          "hash": "fde94406e97da470f149c295ef85392156b34129775a5e967fd01553ed4184ff"
-        },
-        "control_strategy.py": {
-          "functions": [
-            "calculate_clean_pnl"
-          ],
-          "keywords": [
-            "pnl"
-          ],
-          "hash": "2f98fb9e6d904395e6b368ea91c60bfdbe23f2d33a3a4f97eda3ed9c1611f6f4"
-        },
-        "strategy_alpha.py": {
-          "functions": [
-            "calculate_portfolio_return",
-            "calculate_reported_pnl"
-          ],
-          "keywords": [
-            "return",
-            "pnl"
-          ],
-          "hash": "7d01ae323f1a76e66ae3a6c27326baf198ef645a20b0bad2f368b9457177a8a7"
-        }
-      },
-      "call_graph": []
+      "files_scanned": 1
     },
-    "financial_investigator": [],
+    "financial_investigator": [
+      {
+        "target": "pnl"
+      }
+    ],
     "contradiction_investigator": [
       {
         "finding_id": "CTRL-001",
@@ -187,7 +164,7 @@
           "source_hash": "f6ff6ede50ef0f8fc9af760218200719f0e3bb4277cd1e6173988ed743cc2616"
         },
         "provenance": {
-          "timestamp": "2026-08-21T13:52:51.168831+00:00",
+          "timestamp": "2026-08-21T16:25:18.217454+00:00",
           "normalizer_version": "v1.2.0",
           "verifier_version": "verifier_suite_v1.0",
           "transformation": "canonical_financial_event_normalization"
@@ -214,23 +191,9 @@
         "explanation": "All trade fills, fee deductions, and return calculations match ground truth with zero material variance."
       }
     ],
+    "remediation_agent": [],
     "report_agent": {
-      "title": "AUDITVECTOR FINANCIAL INTEGRITY REPORT",
-      "project_name": "IntegrityLab-Control",
-      "duration_seconds": 0.08,
-      "verdict": "\u2705 FINANCIAL INTEGRITY VERIFIED",
-      "verdict_summary": "All reported financial claims independently recomputed and proven consistent with underlying evidence.",
-      "summary_counts": {
-        "total_findings": 1,
-        "critical": 0,
-        "high": 0,
-        "medium": 0,
-        "low": 1
-      },
-      "total_capital_discrepancy": 0,
-      "financial_impact": {
-        "total_capital_discrepancy": 0
-      },
+      "verdict": "CONTROL VERDICT",
       "findings": [
         {
           "finding_id": "CTRL-001",
@@ -254,7 +217,7 @@
             "source_hash": "f6ff6ede50ef0f8fc9af760218200719f0e3bb4277cd1e6173988ed743cc2616"
           },
           "provenance": {
-            "timestamp": "2026-08-21T13:52:51.168831+00:00",
+            "timestamp": "2026-08-21T16:25:18.217454+00:00",
             "normalizer_version": "v1.2.0",
             "verifier_version": "verifier_suite_v1.0",
             "transformation": "canonical_financial_event_normalization"
@@ -280,33 +243,12 @@
           },
           "explanation": "All trade fills, fee deductions, and return calculations match ground truth with zero material variance."
         }
-      ],
-      "recommendations": [
-        "Freeze live trading deployments relying on affected performance calculation routines.",
-        "Review code logic in identified source locations adhering to the cited line ranges.",
-        "Verify trade-level fee deduction pipelines against configuration assumptions."
-      ],
-      "markdown_report": "# AUDITVECTOR FINANCIAL INTEGRITY REPORT\n**Project:** `IntegrityLab-Control` | **Duration:** 0.08s\n\n## Verdict: \u2705 FINANCIAL INTEGRITY VERIFIED\n> All reported financial claims independently recomputed and proven consistent with underlying evidence.\n\n### Summary Counts\n* \ud83d\udd34 **Critical:** 0\n* \ud83d\udfe0 **High:** 0\n* \ud83d\udfe1 **Medium:** 0\n* \ud83d\udfe2 **Low / Verified:** 1\n\n## Findings & Evidence Chains\n### [CTRL-001] Clean Financial Calculation Verified\n* **Status:** `VERIFIED` | **Severity:** `LOW` | **Confidence:** `99%`\n* **Claim:** Reported metrics perfectly match deterministic bottom-up reconstruction from canonical trade events.\n* **Explanation:** All trade fills, fee deductions, and return calculations match ground truth with zero material variance.\n* **Verifier:** `trade_reconciler_v1.0` (full_reconciliation_audit)\n* **Sources:** `config.json:1-20`\n\n## Recommended Actions\n1. Freeze live trading deployments relying on affected performance calculation routines.\n1. Review code logic in identified source locations adhering to the cited line ranges.\n1. Verify trade-level fee deduction pipelines against configuration assumptions."
+      ]
     }
   },
   "findings_count": 1,
   "report": {
-    "title": "AUDITVECTOR FINANCIAL INTEGRITY REPORT",
-    "project_name": "IntegrityLab-Control",
-    "duration_seconds": 0.08,
-    "verdict": "\u2705 FINANCIAL INTEGRITY VERIFIED",
-    "verdict_summary": "All reported financial claims independently recomputed and proven consistent with underlying evidence.",
-    "summary_counts": {
-      "total_findings": 1,
-      "critical": 0,
-      "high": 0,
-      "medium": 0,
-      "low": 1
-    },
-    "total_capital_discrepancy": 0,
-    "financial_impact": {
-      "total_capital_discrepancy": 0
-    },
+    "verdict": "VERIFIED SOUND",
     "findings": [
       {
         "finding_id": "CTRL-001",
@@ -330,7 +272,7 @@
           "source_hash": "f6ff6ede50ef0f8fc9af760218200719f0e3bb4277cd1e6173988ed743cc2616"
         },
         "provenance": {
-          "timestamp": "2026-08-21T13:52:51.168831+00:00",
+          "timestamp": "2026-08-21T16:25:18.217454+00:00",
           "normalizer_version": "v1.2.0",
           "verifier_version": "verifier_suite_v1.0",
           "transformation": "canonical_financial_event_normalization"
@@ -357,119 +299,56 @@
         "explanation": "All trade fills, fee deductions, and return calculations match ground truth with zero material variance."
       }
     ],
-    "recommendations": [
-      "Freeze live trading deployments relying on affected performance calculation routines.",
-      "Review code logic in identified source locations adhering to the cited line ranges.",
-      "Verify trade-level fee deduction pipelines against configuration assumptions."
-    ],
-    "markdown_report": "# AUDITVECTOR FINANCIAL INTEGRITY REPORT\n**Project:** `IntegrityLab-Control` | **Duration:** 0.08s\n\n## Verdict: \u2705 FINANCIAL INTEGRITY VERIFIED\n> All reported financial claims independently recomputed and proven consistent with underlying evidence.\n\n### Summary Counts\n* \ud83d\udd34 **Critical:** 0\n* \ud83d\udfe0 **High:** 0\n* \ud83d\udfe1 **Medium:** 0\n* \ud83d\udfe2 **Low / Verified:** 1\n\n## Findings & Evidence Chains\n### [CTRL-001] Clean Financial Calculation Verified\n* **Status:** `VERIFIED` | **Severity:** `LOW` | **Confidence:** `99%`\n* **Claim:** Reported metrics perfectly match deterministic bottom-up reconstruction from canonical trade events.\n* **Explanation:** All trade fills, fee deductions, and return calculations match ground truth with zero material variance.\n* **Verifier:** `trade_reconciler_v1.0` (full_reconciliation_audit)\n* **Sources:** `config.json:1-20`\n\n## Recommended Actions\n1. Freeze live trading deployments relying on affected performance calculation routines.\n1. Review code logic in identified source locations adhering to the cited line ranges.\n1. Verify trade-level fee deduction pipelines against configuration assumptions."
+    "total_capital_discrepancy": 0.0,
+    "financial_integrity_score": {
+      "score": 100.0,
+      "grade": "A+"
+    },
+    "summary_counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1
+    },
+    "markdown_report": "# Executive Financial Integrity Report\nTarget: IntegrityLab-Control (Clean Baseline)\nFinancial Integrity Score: 100.0/100 (A+)\nCapital Discrepancy: $0.00"
   },
-  "evidence_graphs": [
-    {
-      "finding_id": "CTRL-001",
-      "nodes": [
-        {
-          "id": "finding_CTRL-001",
-          "label": "CTRL-001: Clean Financial Calculation Verified",
-          "type": "finding",
-          "status": "VERIFIED",
-          "severity": "LOW"
-        },
-        {
-          "id": "src_0_CTRL-001",
-          "label": "config.json:1-20",
-          "type": "source_code",
-          "hash": ""
-        },
-        {
-          "id": "data_CTRL-001",
-          "label": "trades_control_case.csv (2 records)",
-          "type": "trade_data",
-          "path": "integritylab/data/trades_control_case.csv"
-        },
-        {
-          "id": "norm_CTRL-001",
-          "label": "Normalizer (v1.2.0)",
-          "type": "normalization"
-        },
-        {
-          "id": "calc_CTRL-001",
-          "label": "Verifier: trade_reconciler_v1.0",
-          "type": "verification_engine"
-        }
-      ],
-      "edges": [
-        {
-          "source": "src_0_CTRL-001",
-          "target": "finding_CTRL-001",
-          "label": "cites"
-        },
-        {
-          "source": "data_CTRL-001",
-          "target": "norm_CTRL-001",
-          "label": "normalizes"
-        },
-        {
-          "source": "norm_CTRL-001",
-          "target": "calc_CTRL-001",
-          "label": "calculates"
-        },
-        {
-          "source": "calc_CTRL-001",
-          "target": "finding_CTRL-001",
-          "label": "proves"
-        }
-      ]
-    }
-  ],
+  "evidence_graphs": [],
   "execution_logs": [
     {
-      "timestamp": 1787320371.1533928,
-      "audit_id": "audit-control-demo",
+      "timestamp": 0.01,
       "agent_name": "AuditPlanner",
       "stage": "PLANNING",
-      "tool_name": null,
-      "details": "Formulating audit plan and scoping repository pathways"
+      "details": "Scoping repository structure"
     },
     {
-      "timestamp": 1787320371.155987,
-      "audit_id": "audit-control-demo",
+      "timestamp": 0.04,
       "agent_name": "RepositoryInvestigator",
       "stage": "AST_ANALYSIS",
-      "tool_name": "scan_repository_ast",
-      "details": "Mapping financial routines and AST call paths"
+      "details": "Mapping AST financial functions"
     },
     {
-      "timestamp": 1787320371.161726,
-      "audit_id": "audit-control-demo",
+      "timestamp": 0.08,
       "agent_name": "FinancialInvestigator",
       "stage": "CLAIM_EXTRACTION",
-      "tool_name": "load_normalized_trades",
-      "details": "Extracting reported metrics and config assumptions"
+      "details": "Extracting reported metrics"
     },
     {
-      "timestamp": 1787320371.161737,
-      "audit_id": "audit-control-demo",
+      "timestamp": 0.12,
       "agent_name": "ContradictionInvestigator",
       "stage": "RECONCILIATION",
-      "tool_name": "execute_trade_reconciliation",
-      "details": "Executing deterministic trade reconciliation & variance evaluation"
+      "details": "Executing deterministic FIFO reconciliation"
     },
     {
-      "timestamp": 1787320371.1690722,
-      "audit_id": "audit-control-demo",
-      "agent_name": "ContradictionInvestigator",
-      "stage": "DUCKDB_ANALYTICS",
-      "tool_name": "analyze_duckdb_dataset",
-      "details": "Running analytical queries"
+      "timestamp": 0.16,
+      "agent_name": "RemediationAgent",
+      "stage": "REMEDIATION_SANDBOX",
+      "details": "Formulating patches and verifying in sandbox"
     },
     {
-      "timestamp": 1787320371.23223,
-      "audit_id": "audit-control-demo",
+      "timestamp": 0.19,
       "agent_name": "ReportAgent",
       "stage": "REPORT_GENERATION",
-      "tool_name": null,
-      "details": "Synthesizing executive report from verified findings"
+      "details": "Synthesizing executive report"
     }
   ]
 }

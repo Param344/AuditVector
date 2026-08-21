@@ -1,6 +1,12 @@
 """Official Google ADK Agent Definitions for AuditVector.
 
-Uses the official google.adk.agents.Agent class to define the 5 specialized agents.
+Uses the official google.adk.agents.Agent class to define the specialized agents:
+1. AuditPlanner
+2. RepositoryInvestigator
+3. FinancialInvestigator
+4. ContradictionInvestigator
+5. RemediationAgent
+6. ReportAgent
 """
 
 from typing import Dict, Any, List, Optional
@@ -44,6 +50,11 @@ Assign official statuses:
 - UNVERIFIABLE: Missing underlying transactional fields.
 Formulate Evidence Contracts for every verified finding."""
 
+REMEDIATION_AGENT_PROMPT = """You are the REMEDIATION AGENT for AuditVector.
+Your goal is to inspect verified contradictions, formulate surgical unified diff patches that fix the underlying mathematical and logic flaws, and verify those patches inside the isolated sandbox.
+CRITICAL SAFETY MANDATE: You MUST NEVER modify the real repository directly.
+All patch applications in the sandbox are strictly isolated. Human authorization is strictly required for production deployment."""
+
 REPORT_AGENT_PROMPT = """You are the REPORT AGENT for AuditVector.
 Your goal is to synthesize the verified evidence, finding classifications, capital-at-risk calculations, and provenance metadata into an Executive Financial Integrity Report.
 You must NOT invent findings, alter statuses, or perform independent arithmetic.
@@ -51,7 +62,7 @@ Grounded truth comes exclusively from the deterministic Evidence Contracts."""
 
 
 def build_five_adk_agents(model_name: Optional[str] = None) -> Dict[str, Agent]:
-    """Instantiates and returns the 5 official google.adk.agents.Agent objects."""
+    """Instantiates and returns the 5 core google.adk.agents.Agent objects."""
     resolved_model = model_name or settings.get_resolved_model()
 
     planner = Agent(
@@ -103,5 +114,22 @@ def build_five_adk_agents(model_name: Optional[str] = None) -> Dict[str, Agent]:
     }
 
 
-# Singleton registry of official ADK agents
+def build_adk_agents(model_name: Optional[str] = None) -> Dict[str, Agent]:
+    """Instantiates and returns all 6 google.adk.agents.Agent objects including RemediationAgent."""
+    agents = build_five_adk_agents(model_name)
+    resolved_model = model_name or settings.get_resolved_model()
+
+    remediation_agent = Agent(
+        name="RemediationAgent",
+        description="Autonomous Sandbox Remediation & Verification Agent",
+        instruction=REMEDIATION_AGENT_PROMPT,
+        model=resolved_model,
+        tools=[sanitize_text]
+    )
+    agents["remediation_agent"] = remediation_agent
+    return agents
+
+
+# Singleton registries
 FIVE_ADK_AGENTS = build_five_adk_agents()
+ADK_AGENTS = build_adk_agents()

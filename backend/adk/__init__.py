@@ -9,15 +9,21 @@ from .tools import (
     ADK_TOOL_REGISTRY
 )
 from .agents import (
+    ADK_AGENTS,
     FIVE_ADK_AGENTS,
+    build_adk_agents,
     build_five_adk_agents
 )
 from .runner import ADKRunner, ADKSession
+from .orchestrator import AdaptiveAuditOrchestrator
 
 __all__ = [
     "ADKRunner",
     "ADKSession",
+    "AdaptiveAuditOrchestrator",
+    "ADK_AGENTS",
     "FIVE_ADK_AGENTS",
+    "build_adk_agents",
     "build_five_adk_agents",
     "ADK_TOOL_REGISTRY",
     "sanitize_text",

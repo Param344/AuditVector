@@ -1,10 +1,28 @@
-"""Backend models package."""
-from .financial_event import FinancialEvent, OrderSide
-from .finding import Finding, FindingStatus, Severity, SourceCitation, DataEvidence, ProvenanceMetadata, CalculationVariance
+from .financial_event import FinancialEvent
+from .finding import (
+    Finding,
+    FindingStatus,
+    Severity,
+    SourceCitation,
+    DataEvidence,
+    ProvenanceMetadata,
+    CalculationVariance
+)
+from .remediation import (
+    RemediationPlan,
+    PatchStatus,
+    SandboxVerificationMetrics
+)
+from .mission import (
+    AuditMission,
+    MissionStatus,
+    MissionStage,
+    MissionScope,
+    AdaptiveDecision
+)
 
 __all__ = [
     "FinancialEvent",
-    "OrderSide",
     "Finding",
     "FindingStatus",
     "Severity",
@@ -12,4 +30,12 @@ __all__ = [
     "DataEvidence",
     "ProvenanceMetadata",
     "CalculationVariance",
+    "RemediationPlan",
+    "PatchStatus",
+    "SandboxVerificationMetrics",
+    "AuditMission",
+    "MissionStatus",
+    "MissionStage",
+    "MissionScope",
+    "AdaptiveDecision"
 ]

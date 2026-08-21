@@ -7,6 +7,7 @@ from .trade_reconciler import TradeReconciler
 from .statistics import FinancialStatistics
 from .comparison import ComparisonEngine
 from .duckdb_engine import DuckDBVerificationEngine
+from .integrity_score import FinancialIntegrityScoreCalculator
 
 __all__ = [
     "PnLRecalculator",
@@ -16,5 +17,6 @@ __all__ = [
     "TradeReconciler",
     "FinancialStatistics",
     "ComparisonEngine",
-    "DuckDBVerificationEngine"
+    "DuckDBVerificationEngine",
+    "FinancialIntegrityScoreCalculator"
 ]

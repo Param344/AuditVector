@@ -12,6 +12,12 @@ class CSVIngestionAdapter:
     """Reads CSV trade/event datasets and converts to Canonical FinancialEvents."""
 
     @classmethod
+    def compute_file_hash(cls, file_path: str) -> str:
+        with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+            content = f.read()
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+    @classmethod
     def load_from_file(cls, file_path: str) -> Tuple[List[FinancialEvent], str, int]:
         """Reads a CSV file, computes its SHA-256 hash, and returns normalized events."""
         with open(file_path, "r", encoding="utf-8", errors="replace") as f:
@@ -30,4 +36,14 @@ class CSVIngestionAdapter:
                 continue
             event = IngestionNormalizer.normalize_row(row, source=source)
             events.append(event)
+        return events
+
+    @classmethod
+    def load_trades_from_csv(cls, file_path: str) -> List[FinancialEvent]:
+        events, _, _ = cls.load_from_file(file_path)
+        return events
+
+    @classmethod
+    def parse_csv_file(cls, file_path: str) -> List[FinancialEvent]:
+        events, _, _ = cls.load_from_file(file_path)
         return events

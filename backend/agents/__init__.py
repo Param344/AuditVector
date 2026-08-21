@@ -1,16 +1,15 @@
-"""Agents package with Full 5-Agent Pipeline."""
 from .audit_planner import AuditPlanner
-from .repository_investigator import RepositoryInvestigator, FinancialCalculationMap
-from .financial_investigator import FinancialInvestigator, FinancialClaim
+from .repository_investigator import RepositoryInvestigator
+from .financial_investigator import FinancialInvestigator
 from .contradiction_investigator import ContradictionInvestigator
 from .report_agent import ReportAgent
+from .remediation_agent import RemediationAgent
 
 __all__ = [
     "AuditPlanner",
     "RepositoryInvestigator",
-    "FinancialCalculationMap",
     "FinancialInvestigator",
-    "FinancialClaim",
     "ContradictionInvestigator",
-    "ReportAgent"
+    "ReportAgent",
+    "RemediationAgent"
 ]

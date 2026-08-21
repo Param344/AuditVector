@@ -385,8 +385,16 @@
                 </div>
                 <div class="verdict-stat-col">
                     <div class="stat-discrepancy-card">
-                        <span class="stat-kicker">TOTAL CAPITAL DISCREPANCY</span>
-                        <strong id="final-capital-discrepancy" class="stat-number-crit">$44,140.00</strong>
+                        <div class="fis-header-row">
+                            <span class="stat-kicker">FINANCIAL INTEGRITY SCORE (FIS)</span>
+                            <span id="final-fis-grade" class="fis-grade-badge grade-f">GRADE F</span>
+                        </div>
+                        <strong id="final-fis-score" class="fis-score-num">24 / 100</strong>
+                        
+                        <div style="margin-top: 12px;">
+                            <span class="stat-kicker">TOTAL CAPITAL DISCREPANCY</span>
+                            <strong id="final-capital-discrepancy" class="stat-number-crit">$44,140.00</strong>
+                        </div>
                         <span id="final-audit-duration" class="stat-sub">Audited in 0.18s • 0 False Positives</span>
                     </div>
                 </div>
@@ -487,6 +495,12 @@
                     <button class="nav-tab-btn active" data-target="panel-findings">
                         <span>🔍 Verified Findings (<span id="tab-findings-badge">0</span>)</span>
                     </button>
+                    <button class="nav-tab-btn" data-target="panel-remediation">
+                        <span>🛠️ Autonomous Remediation (<span id="tab-remediation-badge">0</span>)</span>
+                    </button>
+                    <button class="nav-tab-btn" data-target="panel-replay">
+                        <span>⏪ Audit Replay & Adaptive Log</span>
+                    </button>
                     <button class="nav-tab-btn" data-target="panel-graph">
                         <span>🕸️ Interactive Evidence Graph</span>
                     </button>
@@ -514,6 +528,38 @@
                         </div>
                     </div>
                     <div id="findings-cards-list" class="findings-cards-list"></div>
+                </div>
+
+                <!-- TAB 2: AUTONOMOUS REMEDIATION SANDBOX -->
+                <div id="panel-remediation" class="tab-view-panel">
+                    <div class="remediation-intro-bar">
+                        <div>
+                            <h4>AUTONOMOUS REMEDIATION & VERIFICATION SANDBOX</h4>
+                            <p>Verified surgical unified diffs tested inside an isolated sandbox. Proven to drop discrepancy to $0.00 without modifying repository.</p>
+                        </div>
+                        <span class="remediation-status-tag">100% ISOLATED SANDBOX PROOF</span>
+                    </div>
+                    <div id="remediation-cards-list" class="remediation-cards-list"></div>
+                </div>
+
+                <!-- TAB 3: AUDIT REPLAY & ADAPTIVE DECISION LOG -->
+                <div id="panel-replay" class="tab-view-panel">
+                    <div class="replay-controller-bar">
+                        <div class="replay-info">
+                            <h4>AUDIT MISSION REPLAY & ADAPTIVE DECISION LOG</h4>
+                            <p>Step backward and forward through the 6-stage investigation to review intermediate evidence and ADK routing decisions.</p>
+                        </div>
+                        <div class="replay-actions">
+                            <button id="btn-replay-prev" class="btn-replay-nav">◀ Previous Step</button>
+                            <span id="replay-step-label" class="replay-step-badge">Stage 1 of 6</span>
+                            <button id="btn-replay-next" class="btn-replay-nav">Next Step ▶</button>
+                        </div>
+                    </div>
+                    <div id="replay-stage-viewer" class="replay-stage-viewer"></div>
+                    <div class="adaptive-decisions-container">
+                        <h4 style="margin: 20px 0 12px 0; color: #a5b4fc; font-size: 15px;">ADK ADAPTIVE ROUTING DECISION LOG</h4>
+                        <div id="adaptive-decisions-list" class="adaptive-decisions-list"></div>
+                    </div>
                 </div>
 
                 <!-- TAB 2: INTERACTIVE EVIDENCE GRAPH -->

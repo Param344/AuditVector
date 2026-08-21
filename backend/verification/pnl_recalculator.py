@@ -38,13 +38,15 @@ class PnLRecalculator:
         closed_trades = 0
 
         for event in sorted_events:
-            total_fees += event.fee
+            fee_dec = Decimal(str(event.fee)) if not isinstance(event.fee, Decimal) else event.fee
+            total_fees += fee_dec
             sym = event.symbol
             if sym not in symbol_queues:
                 symbol_queues[sym] = []
 
             queue = symbol_queues[sym]
-            incoming_qty = event.quantity
+            incoming_qty = Decimal(str(event.quantity)) if not isinstance(event.quantity, Decimal) else event.quantity
+            incoming_price = Decimal(str(event.price)) if not isinstance(event.price, Decimal) else event.price
             incoming_side = event.side
 
             # If queue is empty or has same side lots, simply add to queue
@@ -52,7 +54,7 @@ class PnLRecalculator:
                 queue.append({
                     "side": incoming_side,
                     "qty": incoming_qty,
-                    "price": event.price,
+                    "price": incoming_price,
                     "event_id": event.event_id
                 })
             else:
@@ -63,10 +65,10 @@ class PnLRecalculator:
 
                     if open_lot["side"] == OrderSide.BUY:
                         # Closing long position with incoming SELL
-                        trade_pnl = (event.price - open_lot["price"]) * matched_qty
+                        trade_pnl = (incoming_price - open_lot["price"]) * matched_qty
                     else:
                         # Closing short position with incoming BUY
-                        trade_pnl = (open_lot["price"] - event.price) * matched_qty
+                        trade_pnl = (open_lot["price"] - incoming_price) * matched_qty
 
                     realized_pnl += trade_pnl
                     if trade_pnl > Decimal("0.0"):
