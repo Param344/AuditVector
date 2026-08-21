@@ -1,0 +1,686 @@
+{
+  "status": "COMPLETED",
+  "audit_id": "audit-aibip-demo",
+  "project_name": "AI-BIP-Quant-Dogfood",
+  "mode": "OFFLINE_DETERMINISTIC",
+  "gemini_model": "gemini-3.5-flash",
+  "duration_seconds": 0.07,
+  "agent_pipeline": {
+    "planner": {
+      "repo_scan": {
+        "total_files": 3,
+        "financial_modules": [
+          "slippage_model.py",
+          "config.json",
+          "backtest_engine.py"
+        ],
+        "files": {
+          "slippage_model.py": {
+            "path": "slippage_model.py",
+            "abs_path": "dogfood/aibip/source/slippage_model.py",
+            "hash": "eb1558d4a6cf3e98ca86096f870ac59bf2d41cca524f9e77d85502487ee85eba",
+            "line_count": 13,
+            "keywords": [
+              "fee",
+              "return",
+              "trade",
+              "execution",
+              "slippage"
+            ],
+            "is_financial": true
+          },
+          "config.json": {
+            "path": "config.json",
+            "abs_path": "dogfood/aibip/source/config.json",
+            "hash": "9bc4c8ae200117c0c91727eebdd5e1c4d86a911be82515cd3f6753314068536d",
+            "line_count": 9,
+            "keywords": [
+              "fee",
+              "drawdown"
+            ],
+            "is_financial": true
+          },
+          "backtest_engine.py": {
+            "path": "backtest_engine.py",
+            "abs_path": "dogfood/aibip/source/backtest_engine.py",
+            "hash": "e85e2cd23d7f13e92b01a27155d4be8655f02863543b81699f6400e6657e5888",
+            "line_count": 20,
+            "keywords": [
+              "pnl",
+              "return",
+              "equity"
+            ],
+            "is_financial": true
+          }
+        }
+      },
+      "data_path": "dogfood/aibip/data/trades_aibip_real.csv",
+      "report_path": "dogfood/aibip/reports/aibip_performance_report.json",
+      "audit_plan": [
+        {
+          "step": 1,
+          "task": "Redact secrets from discovered source and config files",
+          "status": "PLANNED"
+        },
+        {
+          "step": 2,
+          "task": "Ingest and normalize raw trade event datasets to Canonical FinancialEvent model",
+          "status": "PLANNED"
+        },
+        {
+          "step": 3,
+          "task": "Map financial calculation pathways in discovered code modules",
+          "modules": [
+            "slippage_model.py",
+            "config.json",
+            "backtest_engine.py"
+          ],
+          "status": "PLANNED"
+        },
+        {
+          "step": 4,
+          "task": "Execute bottom-up deterministic PnL reconstruction",
+          "status": "PLANNED"
+        },
+        {
+          "step": 5,
+          "task": "Analyze fee accounting for double-counting and model rate variances",
+          "status": "PLANNED"
+        },
+        {
+          "step": 6,
+          "task": "Evaluate return calculation polarity and sign consistency",
+          "status": "PLANNED"
+        },
+        {
+          "step": 7,
+          "task": "Cross-reconcile reported performance claims against deterministic truth",
+          "status": "PLANNED"
+        },
+        {
+          "step": 8,
+          "task": "Formulate Evidence Contracts for verified findings",
+          "status": "PLANNED"
+        },
+        {
+          "step": 9,
+          "task": "Generate executive financial integrity audit report",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    "repository_investigator": {
+      "total_mapped_modules": 2,
+      "modules": {
+        "slippage_model.py": {
+          "functions": [
+            "calculate_trade_fee"
+          ],
+          "keywords": [
+            "fee",
+            "trade"
+          ],
+          "hash": "eb1558d4a6cf3e98ca86096f870ac59bf2d41cca524f9e77d85502487ee85eba"
+        },
+        "backtest_engine.py": {
+          "functions": [
+            "__init__",
+            "calculate_strategy_performance"
+          ],
+          "keywords": [],
+          "hash": "e85e2cd23d7f13e92b01a27155d4be8655f02863543b81699f6400e6657e5888"
+        }
+      },
+      "call_graph": []
+    },
+    "financial_investigator": [],
+    "contradiction_investigator": [
+      {
+        "finding_id": "F-001",
+        "title": "PnL Reconciliation Integrity Failure",
+        "status": "CONTRADICTION",
+        "severity": "HIGH",
+        "confidence": 0.95,
+        "claim": "System reports Net PnL of $54,200.00 while independent deterministic reconstruction yields $37,913.76.",
+        "sources": [
+          {
+            "file": "backtest_engine.py",
+            "line_range": "1-50",
+            "source_hash": "e85e2cd23d7f13e92b01a27155d4be8655f02863543b81699f6400e6657e5888",
+            "code_snippet": null
+          }
+        ],
+        "data_evidence": {
+          "dataset_id": "trades_aibip_real.csv",
+          "record_count": 8,
+          "source_path": "dogfood/aibip/data/trades_aibip_real.csv",
+          "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
+        },
+        "provenance": {
+          "timestamp": "2026-08-21T13:52:51.250909+00:00",
+          "normalizer_version": "v1.2.0",
+          "verifier_version": "verifier_suite_v1.0",
+          "transformation": "canonical_financial_event_normalization"
+        },
+        "calculation": {
+          "reported_pnl": 54200.0,
+          "reconstructed_pnl": 37913.76,
+          "reported_return_pct": 21.68,
+          "reconstructed_return_pct": 37.9138,
+          "reported_fee": null,
+          "recalculated_fee": null,
+          "variance_amount": 16286.239999999998,
+          "details": {}
+        },
+        "verification": {
+          "status": "CONTRADICTION",
+          "method": "deterministic_fifo_recalculation",
+          "verifier": "pnl_recalculator_v2.2"
+        },
+        "impact": {
+          "level": "VERY_HIGH",
+          "capital_at_risk": 16286.239999999998
+        },
+        "explanation": "Material discrepancy in Realized Net PnL: variance of 16286.24 (30.0%)"
+      },
+      {
+        "finding_id": "F-004",
+        "title": "Configuration Fee Model Rate Mismatch",
+        "status": "WARNING",
+        "severity": "MEDIUM",
+        "confidence": 0.89,
+        "claim": "Configuration claims a 8.0 bps fee model, but actual trade execution fees average 0.8 bps.",
+        "sources": [
+          {
+            "file": "slippage_model.py",
+            "line_range": "1-20",
+            "source_hash": "eb1558d4a6cf3e98ca86096f870ac59bf2d41cca524f9e77d85502487ee85eba",
+            "code_snippet": null
+          },
+          {
+            "file": "config.json",
+            "line_range": "1-20",
+            "source_hash": "9bc4c8ae200117c0c91727eebdd5e1c4d86a911be82515cd3f6753314068536d",
+            "code_snippet": null
+          }
+        ],
+        "data_evidence": {
+          "dataset_id": "trades_aibip_real.csv",
+          "record_count": 8,
+          "source_path": "dogfood/aibip/data/trades_aibip_real.csv",
+          "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
+        },
+        "provenance": {
+          "timestamp": "2026-08-21T13:52:51.250909+00:00",
+          "normalizer_version": "v1.2.0",
+          "verifier_version": "verifier_suite_v1.0",
+          "transformation": "canonical_financial_event_normalization"
+        },
+        "calculation": {
+          "reported_pnl": null,
+          "reconstructed_pnl": null,
+          "reported_return_pct": null,
+          "reconstructed_return_pct": null,
+          "reported_fee": null,
+          "recalculated_fee": null,
+          "variance_amount": null,
+          "details": {
+            "claimed_fee_bps": 8.0,
+            "effective_fee_bps": 0.8,
+            "model_variance_amount": -776.16
+          }
+        },
+        "verification": {
+          "status": "WARNING",
+          "method": "fee_rate_model_audit",
+          "verifier": "fee_recalculator_v1.0"
+        },
+        "impact": {
+          "level": "MEDIUM",
+          "capital_at_risk": 776.1600000000001
+        },
+        "explanation": "Runtime execution fees (0.8 bps) deviate materially from configured policy assumption (8.0 bps)."
+      }
+    ],
+    "report_agent": {
+      "title": "AUDITVECTOR FINANCIAL INTEGRITY REPORT",
+      "project_name": "AI-BIP-Quant-Dogfood",
+      "duration_seconds": 0.07,
+      "verdict": "\u26a0\ufe0f RESULTS NOT FULLY TRUSTWORTHY",
+      "verdict_summary": "AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.",
+      "summary_counts": {
+        "total_findings": 2,
+        "critical": 0,
+        "high": 1,
+        "medium": 1,
+        "low": 0
+      },
+      "total_capital_discrepancy": 16286.239999999998,
+      "financial_impact": {
+        "total_capital_discrepancy": 16286.239999999998
+      },
+      "findings": [
+        {
+          "finding_id": "F-001",
+          "title": "PnL Reconciliation Integrity Failure",
+          "status": "CONTRADICTION",
+          "severity": "HIGH",
+          "confidence": 0.95,
+          "claim": "System reports Net PnL of $54,200.00 while independent deterministic reconstruction yields $37,913.76.",
+          "sources": [
+            {
+              "file": "backtest_engine.py",
+              "line_range": "1-50",
+              "source_hash": "e85e2cd23d7f13e92b01a27155d4be8655f02863543b81699f6400e6657e5888",
+              "code_snippet": null
+            }
+          ],
+          "data_evidence": {
+            "dataset_id": "trades_aibip_real.csv",
+            "record_count": 8,
+            "source_path": "dogfood/aibip/data/trades_aibip_real.csv",
+            "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
+          },
+          "provenance": {
+            "timestamp": "2026-08-21T13:52:51.250909+00:00",
+            "normalizer_version": "v1.2.0",
+            "verifier_version": "verifier_suite_v1.0",
+            "transformation": "canonical_financial_event_normalization"
+          },
+          "calculation": {
+            "reported_pnl": 54200.0,
+            "reconstructed_pnl": 37913.76,
+            "reported_return_pct": 21.68,
+            "reconstructed_return_pct": 37.9138,
+            "reported_fee": null,
+            "recalculated_fee": null,
+            "variance_amount": 16286.239999999998,
+            "details": {}
+          },
+          "verification": {
+            "status": "CONTRADICTION",
+            "method": "deterministic_fifo_recalculation",
+            "verifier": "pnl_recalculator_v2.2"
+          },
+          "impact": {
+            "level": "VERY_HIGH",
+            "capital_at_risk": 16286.239999999998
+          },
+          "explanation": "Material discrepancy in Realized Net PnL: variance of 16286.24 (30.0%)"
+        },
+        {
+          "finding_id": "F-004",
+          "title": "Configuration Fee Model Rate Mismatch",
+          "status": "WARNING",
+          "severity": "MEDIUM",
+          "confidence": 0.89,
+          "claim": "Configuration claims a 8.0 bps fee model, but actual trade execution fees average 0.8 bps.",
+          "sources": [
+            {
+              "file": "slippage_model.py",
+              "line_range": "1-20",
+              "source_hash": "eb1558d4a6cf3e98ca86096f870ac59bf2d41cca524f9e77d85502487ee85eba",
+              "code_snippet": null
+            },
+            {
+              "file": "config.json",
+              "line_range": "1-20",
+              "source_hash": "9bc4c8ae200117c0c91727eebdd5e1c4d86a911be82515cd3f6753314068536d",
+              "code_snippet": null
+            }
+          ],
+          "data_evidence": {
+            "dataset_id": "trades_aibip_real.csv",
+            "record_count": 8,
+            "source_path": "dogfood/aibip/data/trades_aibip_real.csv",
+            "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
+          },
+          "provenance": {
+            "timestamp": "2026-08-21T13:52:51.250909+00:00",
+            "normalizer_version": "v1.2.0",
+            "verifier_version": "verifier_suite_v1.0",
+            "transformation": "canonical_financial_event_normalization"
+          },
+          "calculation": {
+            "reported_pnl": null,
+            "reconstructed_pnl": null,
+            "reported_return_pct": null,
+            "reconstructed_return_pct": null,
+            "reported_fee": null,
+            "recalculated_fee": null,
+            "variance_amount": null,
+            "details": {
+              "claimed_fee_bps": 8.0,
+              "effective_fee_bps": 0.8,
+              "model_variance_amount": -776.16
+            }
+          },
+          "verification": {
+            "status": "WARNING",
+            "method": "fee_rate_model_audit",
+            "verifier": "fee_recalculator_v1.0"
+          },
+          "impact": {
+            "level": "MEDIUM",
+            "capital_at_risk": 776.1600000000001
+          },
+          "explanation": "Runtime execution fees (0.8 bps) deviate materially from configured policy assumption (8.0 bps)."
+        }
+      ],
+      "recommendations": [
+        "Freeze live trading deployments relying on affected performance calculation routines.",
+        "Review code logic in identified source locations adhering to the cited line ranges.",
+        "Verify trade-level fee deduction pipelines against configuration assumptions."
+      ],
+      "markdown_report": "# AUDITVECTOR FINANCIAL INTEGRITY REPORT\n**Project:** `AI-BIP-Quant-Dogfood` | **Duration:** 0.07s\n\n## Verdict: \u26a0\ufe0f RESULTS NOT FULLY TRUSTWORTHY\n> AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.\n\n### Summary Counts\n* \ud83d\udd34 **Critical:** 0\n* \ud83d\udfe0 **High:** 1\n* \ud83d\udfe1 **Medium:** 1\n* \ud83d\udfe2 **Low / Verified:** 0\n\n**Total Capital Discrepancy:** `$16,286.24`\n\n## Findings & Evidence Chains\n### [F-001] PnL Reconciliation Integrity Failure\n* **Status:** `CONTRADICTION` | **Severity:** `HIGH` | **Confidence:** `95%`\n* **Claim:** System reports Net PnL of $54,200.00 while independent deterministic reconstruction yields $37,913.76.\n* **Explanation:** Material discrepancy in Realized Net PnL: variance of 16286.24 (30.0%)\n* **Verifier:** `pnl_recalculator_v2.2` (deterministic_fifo_recalculation)\n* **Sources:** `backtest_engine.py:1-50`\n\n### [F-004] Configuration Fee Model Rate Mismatch\n* **Status:** `WARNING` | **Severity:** `MEDIUM` | **Confidence:** `89%`\n* **Claim:** Configuration claims a 8.0 bps fee model, but actual trade execution fees average 0.8 bps.\n* **Explanation:** Runtime execution fees (0.8 bps) deviate materially from configured policy assumption (8.0 bps).\n* **Verifier:** `fee_recalculator_v1.0` (fee_rate_model_audit)\n* **Sources:** `slippage_model.py:1-20`, `config.json:1-20`\n\n## Recommended Actions\n1. Freeze live trading deployments relying on affected performance calculation routines.\n1. Review code logic in identified source locations adhering to the cited line ranges.\n1. Verify trade-level fee deduction pipelines against configuration assumptions."
+    }
+  },
+  "findings_count": 2,
+  "report": {
+    "title": "AUDITVECTOR FINANCIAL INTEGRITY REPORT",
+    "project_name": "AI-BIP-Quant-Dogfood",
+    "duration_seconds": 0.07,
+    "verdict": "\u26a0\ufe0f RESULTS NOT FULLY TRUSTWORTHY",
+    "verdict_summary": "AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.",
+    "summary_counts": {
+      "total_findings": 2,
+      "critical": 0,
+      "high": 1,
+      "medium": 1,
+      "low": 0
+    },
+    "total_capital_discrepancy": 16286.239999999998,
+    "financial_impact": {
+      "total_capital_discrepancy": 16286.239999999998
+    },
+    "findings": [
+      {
+        "finding_id": "F-001",
+        "title": "PnL Reconciliation Integrity Failure",
+        "status": "CONTRADICTION",
+        "severity": "HIGH",
+        "confidence": 0.95,
+        "claim": "System reports Net PnL of $54,200.00 while independent deterministic reconstruction yields $37,913.76.",
+        "sources": [
+          {
+            "file": "backtest_engine.py",
+            "line_range": "1-50",
+            "source_hash": "e85e2cd23d7f13e92b01a27155d4be8655f02863543b81699f6400e6657e5888",
+            "code_snippet": null
+          }
+        ],
+        "data_evidence": {
+          "dataset_id": "trades_aibip_real.csv",
+          "record_count": 8,
+          "source_path": "dogfood/aibip/data/trades_aibip_real.csv",
+          "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
+        },
+        "provenance": {
+          "timestamp": "2026-08-21T13:52:51.250909+00:00",
+          "normalizer_version": "v1.2.0",
+          "verifier_version": "verifier_suite_v1.0",
+          "transformation": "canonical_financial_event_normalization"
+        },
+        "calculation": {
+          "reported_pnl": 54200.0,
+          "reconstructed_pnl": 37913.76,
+          "reported_return_pct": 21.68,
+          "reconstructed_return_pct": 37.9138,
+          "reported_fee": null,
+          "recalculated_fee": null,
+          "variance_amount": 16286.239999999998,
+          "details": {}
+        },
+        "verification": {
+          "status": "CONTRADICTION",
+          "method": "deterministic_fifo_recalculation",
+          "verifier": "pnl_recalculator_v2.2"
+        },
+        "impact": {
+          "level": "VERY_HIGH",
+          "capital_at_risk": 16286.239999999998
+        },
+        "explanation": "Material discrepancy in Realized Net PnL: variance of 16286.24 (30.0%)"
+      },
+      {
+        "finding_id": "F-004",
+        "title": "Configuration Fee Model Rate Mismatch",
+        "status": "WARNING",
+        "severity": "MEDIUM",
+        "confidence": 0.89,
+        "claim": "Configuration claims a 8.0 bps fee model, but actual trade execution fees average 0.8 bps.",
+        "sources": [
+          {
+            "file": "slippage_model.py",
+            "line_range": "1-20",
+            "source_hash": "eb1558d4a6cf3e98ca86096f870ac59bf2d41cca524f9e77d85502487ee85eba",
+            "code_snippet": null
+          },
+          {
+            "file": "config.json",
+            "line_range": "1-20",
+            "source_hash": "9bc4c8ae200117c0c91727eebdd5e1c4d86a911be82515cd3f6753314068536d",
+            "code_snippet": null
+          }
+        ],
+        "data_evidence": {
+          "dataset_id": "trades_aibip_real.csv",
+          "record_count": 8,
+          "source_path": "dogfood/aibip/data/trades_aibip_real.csv",
+          "source_hash": "a52304126b39f9ab67c5738edd6c5f11e46c338a74e0b79e06b42054e9f95da8"
+        },
+        "provenance": {
+          "timestamp": "2026-08-21T13:52:51.250909+00:00",
+          "normalizer_version": "v1.2.0",
+          "verifier_version": "verifier_suite_v1.0",
+          "transformation": "canonical_financial_event_normalization"
+        },
+        "calculation": {
+          "reported_pnl": null,
+          "reconstructed_pnl": null,
+          "reported_return_pct": null,
+          "reconstructed_return_pct": null,
+          "reported_fee": null,
+          "recalculated_fee": null,
+          "variance_amount": null,
+          "details": {
+            "claimed_fee_bps": 8.0,
+            "effective_fee_bps": 0.8,
+            "model_variance_amount": -776.16
+          }
+        },
+        "verification": {
+          "status": "WARNING",
+          "method": "fee_rate_model_audit",
+          "verifier": "fee_recalculator_v1.0"
+        },
+        "impact": {
+          "level": "MEDIUM",
+          "capital_at_risk": 776.1600000000001
+        },
+        "explanation": "Runtime execution fees (0.8 bps) deviate materially from configured policy assumption (8.0 bps)."
+      }
+    ],
+    "recommendations": [
+      "Freeze live trading deployments relying on affected performance calculation routines.",
+      "Review code logic in identified source locations adhering to the cited line ranges.",
+      "Verify trade-level fee deduction pipelines against configuration assumptions."
+    ],
+    "markdown_report": "# AUDITVECTOR FINANCIAL INTEGRITY REPORT\n**Project:** `AI-BIP-Quant-Dogfood` | **Duration:** 0.07s\n\n## Verdict: \u26a0\ufe0f RESULTS NOT FULLY TRUSTWORTHY\n> AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.\n\n### Summary Counts\n* \ud83d\udd34 **Critical:** 0\n* \ud83d\udfe0 **High:** 1\n* \ud83d\udfe1 **Medium:** 1\n* \ud83d\udfe2 **Low / Verified:** 0\n\n**Total Capital Discrepancy:** `$16,286.24`\n\n## Findings & Evidence Chains\n### [F-001] PnL Reconciliation Integrity Failure\n* **Status:** `CONTRADICTION` | **Severity:** `HIGH` | **Confidence:** `95%`\n* **Claim:** System reports Net PnL of $54,200.00 while independent deterministic reconstruction yields $37,913.76.\n* **Explanation:** Material discrepancy in Realized Net PnL: variance of 16286.24 (30.0%)\n* **Verifier:** `pnl_recalculator_v2.2` (deterministic_fifo_recalculation)\n* **Sources:** `backtest_engine.py:1-50`\n\n### [F-004] Configuration Fee Model Rate Mismatch\n* **Status:** `WARNING` | **Severity:** `MEDIUM` | **Confidence:** `89%`\n* **Claim:** Configuration claims a 8.0 bps fee model, but actual trade execution fees average 0.8 bps.\n* **Explanation:** Runtime execution fees (0.8 bps) deviate materially from configured policy assumption (8.0 bps).\n* **Verifier:** `fee_recalculator_v1.0` (fee_rate_model_audit)\n* **Sources:** `slippage_model.py:1-20`, `config.json:1-20`\n\n## Recommended Actions\n1. Freeze live trading deployments relying on affected performance calculation routines.\n1. Review code logic in identified source locations adhering to the cited line ranges.\n1. Verify trade-level fee deduction pipelines against configuration assumptions."
+  },
+  "evidence_graphs": [
+    {
+      "finding_id": "F-001",
+      "nodes": [
+        {
+          "id": "finding_F-001",
+          "label": "F-001: PnL Reconciliation Integrity Failure",
+          "type": "finding",
+          "status": "CONTRADICTION",
+          "severity": "HIGH"
+        },
+        {
+          "id": "src_0_F-001",
+          "label": "backtest_engine.py:1-50",
+          "type": "source_code",
+          "hash": "e85e2cd2"
+        },
+        {
+          "id": "data_F-001",
+          "label": "trades_aibip_real.csv (8 records)",
+          "type": "trade_data",
+          "path": "dogfood/aibip/data/trades_aibip_real.csv"
+        },
+        {
+          "id": "norm_F-001",
+          "label": "Normalizer (v1.2.0)",
+          "type": "normalization"
+        },
+        {
+          "id": "calc_F-001",
+          "label": "Verifier: pnl_recalculator_v2.2",
+          "type": "verification_engine"
+        }
+      ],
+      "edges": [
+        {
+          "source": "src_0_F-001",
+          "target": "finding_F-001",
+          "label": "cites"
+        },
+        {
+          "source": "data_F-001",
+          "target": "norm_F-001",
+          "label": "normalizes"
+        },
+        {
+          "source": "norm_F-001",
+          "target": "calc_F-001",
+          "label": "calculates"
+        },
+        {
+          "source": "calc_F-001",
+          "target": "finding_F-001",
+          "label": "proves"
+        }
+      ]
+    },
+    {
+      "finding_id": "F-004",
+      "nodes": [
+        {
+          "id": "finding_F-004",
+          "label": "F-004: Configuration Fee Model Rate Mismatch",
+          "type": "finding",
+          "status": "WARNING",
+          "severity": "MEDIUM"
+        },
+        {
+          "id": "src_0_F-004",
+          "label": "slippage_model.py:1-20",
+          "type": "source_code",
+          "hash": "eb1558d4"
+        },
+        {
+          "id": "src_1_F-004",
+          "label": "config.json:1-20",
+          "type": "source_code",
+          "hash": "9bc4c8ae"
+        },
+        {
+          "id": "data_F-004",
+          "label": "trades_aibip_real.csv (8 records)",
+          "type": "trade_data",
+          "path": "dogfood/aibip/data/trades_aibip_real.csv"
+        },
+        {
+          "id": "norm_F-004",
+          "label": "Normalizer (v1.2.0)",
+          "type": "normalization"
+        },
+        {
+          "id": "calc_F-004",
+          "label": "Verifier: fee_recalculator_v1.0",
+          "type": "verification_engine"
+        }
+      ],
+      "edges": [
+        {
+          "source": "src_0_F-004",
+          "target": "finding_F-004",
+          "label": "cites"
+        },
+        {
+          "source": "src_1_F-004",
+          "target": "finding_F-004",
+          "label": "cites"
+        },
+        {
+          "source": "data_F-004",
+          "target": "norm_F-004",
+          "label": "normalizes"
+        },
+        {
+          "source": "norm_F-004",
+          "target": "calc_F-004",
+          "label": "calculates"
+        },
+        {
+          "source": "calc_F-004",
+          "target": "finding_F-004",
+          "label": "proves"
+        }
+      ]
+    }
+  ],
+  "execution_logs": [
+    {
+      "timestamp": 1787320371.232482,
+      "audit_id": "audit-aibip-demo",
+      "agent_name": "AuditPlanner",
+      "stage": "PLANNING",
+      "tool_name": null,
+      "details": "Formulating audit plan and scoping repository pathways"
+    },
+    {
+      "timestamp": 1787320371.2423549,
+      "audit_id": "audit-aibip-demo",
+      "agent_name": "RepositoryInvestigator",
+      "stage": "AST_ANALYSIS",
+      "tool_name": "scan_repository_ast",
+      "details": "Mapping financial routines and AST call paths"
+    },
+    {
+      "timestamp": 1787320371.2437592,
+      "audit_id": "audit-aibip-demo",
+      "agent_name": "FinancialInvestigator",
+      "stage": "CLAIM_EXTRACTION",
+      "tool_name": "load_normalized_trades",
+      "details": "Extracting reported metrics and config assumptions"
+    },
+    {
+      "timestamp": 1787320371.2437718,
+      "audit_id": "audit-aibip-demo",
+      "agent_name": "ContradictionInvestigator",
+      "stage": "RECONCILIATION",
+      "tool_name": "execute_trade_reconciliation",
+      "details": "Executing deterministic trade reconciliation & variance evaluation"
+    },
+    {
+      "timestamp": 1787320371.251231,
+      "audit_id": "audit-aibip-demo",
+      "agent_name": "ContradictionInvestigator",
+      "stage": "DUCKDB_ANALYTICS",
+      "tool_name": "analyze_duckdb_dataset",
+      "details": "Running analytical queries"
+    },
+    {
+      "timestamp": 1787320371.305295,
+      "audit_id": "audit-aibip-demo",
+      "agent_name": "ReportAgent",
+      "stage": "REPORT_GENERATION",
+      "tool_name": null,
+      "details": "Synthesizing executive report from verified findings"
+    }
+  ]
+}
