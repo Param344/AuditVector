@@ -622,6 +622,28 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function formatLogTimestamp(ts) {
+        if (!ts) return "00:00:00";
+        if (typeof ts === "string") {
+            if (ts.includes("T")) {
+                return ts.split("T")[1]?.slice(0, 8) || "00:00:00";
+            }
+            if (ts.includes(" ")) {
+                return ts.split(" ")[1]?.slice(0, 8) || "00:00:00";
+            }
+            return ts.slice(0, 8);
+        }
+        if (typeof ts === "number") {
+            const ms = ts > 1e11 ? ts : ts * 1000;
+            const d = new Date(ms);
+            return !isNaN(d.getTime()) ? d.toTimeString().slice(0, 8) : "00:00:00";
+        }
+        if (ts instanceof Date) {
+            return !isNaN(ts.getTime()) ? ts.toTimeString().slice(0, 8) : "00:00:00";
+        }
+        return String(ts).slice(0, 8);
+    }
+
     function renderForensicAuditTimeline(logs) {
         forensicTimelineList.innerHTML = "";
 
@@ -634,7 +656,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const item = document.createElement("div");
             item.className = "timeline-event-item";
 
-            const timeFormatted = log.timestamp ? log.timestamp.split("T")[1]?.slice(0, 8) : "00:00:00";
+            const timeFormatted = formatLogTimestamp(log.timestamp);
 
             item.innerHTML = `
                 <div class="timeline-event-dot"></div>
@@ -687,25 +709,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const calc = finding.calculation || {};
         
-        let reportedNum = calc.reported_pnl;
-        let reconstructedNum = calc.reconstructed_pnl;
+        let reportedNum = (calc.reported_pnl !== undefined && calc.reported_pnl !== null) ? Number(calc.reported_pnl) : null;
+        let reconstructedNum = (calc.reconstructed_pnl !== undefined && calc.reconstructed_pnl !== null) ? Number(calc.reconstructed_pnl) : null;
         
-        if (reportedNum === undefined && calc.reported_fee !== undefined) {
-            reportedNum = calc.reported_fee;
-            reconstructedNum = calc.recalculated_fee;
+        if (reportedNum === null && calc.reported_fee !== undefined && calc.reported_fee !== null) {
+            reportedNum = Number(calc.reported_fee);
+            reconstructedNum = (calc.recalculated_fee !== undefined && calc.recalculated_fee !== null) ? Number(calc.recalculated_fee) : 0;
         }
 
-        if (reportedNum !== undefined && reconstructedNum !== undefined) {
-            drawerValReported.textContent = `$${reportedNum.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            drawerValReconstructed.textContent = `$${reconstructedNum.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        if (reportedNum !== null && reconstructedNum !== null && !isNaN(reportedNum) && !isNaN(reconstructedNum)) {
+            drawerValReported.textContent = `$${reportedNum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            drawerValReconstructed.textContent = `$${reconstructedNum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             const varianceVal = Math.abs(reportedNum - reconstructedNum);
-            drawerValVariance.textContent = `$${varianceVal.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-            drawerValCapital.textContent = `$${(finding.capital_at_risk || varianceVal).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            drawerValVariance.textContent = `$${varianceVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            drawerValCapital.textContent = `$${(Number(finding.capital_at_risk) || varianceVal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         } else {
-            drawerValReported.textContent = finding.claim;
+            drawerValReported.textContent = finding.claim || "N/A";
             drawerValReconstructed.textContent = "Deterministic Calculation Proof";
             drawerValVariance.textContent = "$0.00";
-            drawerValCapital.textContent = `$${(finding.capital_at_risk || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            drawerValCapital.textContent = `$${(Number(finding.capital_at_risk) || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         }
 
         const source = finding.sources?.[0] || { file: "source_strategy.py", line_range: "1-50", source_hash: "" };
