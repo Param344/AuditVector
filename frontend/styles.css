@@ -1253,6 +1253,7 @@ body.forensic-theme {
     padding: 1.5rem;
 }
 
+.tab-view-panel.active,
 .tab-view-panel.active-tab {
     display: block;
 }

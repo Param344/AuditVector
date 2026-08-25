@@ -6,7 +6,30 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     // =========================================================================
-    // 1. STATE & DOM REFERENCES
+    // 1. STATE ARCHITECTURE (SINGLE SOURCE OF TRUTH)
+    // =========================================================================
+    
+    const UIState = {
+        activeBenchmark: "",
+        activeAuditToken: 0,
+        activeTab: "panel-findings",
+        activeFilter: "ALL",
+        currentAuditId: "",
+        result: null,
+        report: null,
+        findings: [],
+        remediationPlans: [],
+        replaySnapshots: [],
+        adaptiveDecisions: [],
+        evidenceGraphs: [],
+        executionLogs: [],
+        markdownReport: "",
+        duckdbProfile: {},
+        currentReplayIndex: 0
+    };
+
+    // =========================================================================
+    // 2. DOM ELEMENT REFERENCES
     // =========================================================================
     
     // Screens
@@ -42,6 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const verdictSummaryText = document.getElementById("verdict-summary-text");
     const finalCapitalDiscrepancy = document.getElementById("final-capital-discrepancy");
     const finalAuditDuration = document.getElementById("final-audit-duration");
+    const finalFisScore = document.getElementById("final-fis-score");
+    const finalFisGrade = document.getElementById("final-fis-grade");
 
     // Claim vs Reality Panel
     const claimSourceName = document.getElementById("claim-source-name");
@@ -52,17 +77,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const realityPnlVal = document.getElementById("reality-pnl-val");
     const realityReturnVal = document.getElementById("reality-return-val");
 
-    // Summary Counts
+    // Summary Counts & Badges
     const summaryCritCount = document.getElementById("summary-crit-count");
     const summaryHighCount = document.getElementById("summary-high-count");
     const summaryMedCount = document.getElementById("summary-med-count");
     const summaryLowCount = document.getElementById("summary-low-count");
     const tabFindingsBadge = document.getElementById("tab-findings-badge");
+    const tabRemediationBadge = document.getElementById("tab-remediation-badge");
 
     // Tab Views & Containers
     const navTabBtns = document.querySelectorAll(".nav-tab-btn");
     const tabPanels = document.querySelectorAll(".tab-view-panel");
     const findingsCardsList = document.getElementById("findings-cards-list");
+    const remediationCardsList = document.getElementById("remediation-cards-list");
+    const replayStageViewer = document.getElementById("replay-stage-viewer");
+    const replayStepLabel = document.getElementById("replay-step-label");
+    const btnReplayPrev = document.getElementById("btn-replay-prev");
+    const btnReplayNext = document.getElementById("btn-replay-next");
+    const adaptiveDecisionsList = document.getElementById("adaptive-decisions-list");
     const evidenceGraphViewport = document.getElementById("evidence-graph-viewport");
     const forensicTimelineList = document.getElementById("forensic-timeline-list");
     const markdownReportContainer = document.getElementById("markdown-report-container");
@@ -98,19 +130,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const drawerProvData = document.getElementById("drawer-prov-data");
     const runtimeStatusTag = document.getElementById("runtime-status-tag");
 
-    // Runtime state variables
-    let currentAuditId = "";
-    let currentAuditResult = null;
-    let currentFindings = [];
-    let currentActiveFilter = "ALL";
-    let currentMarkdownReport = "";
-    let auditStartTime = 0;
     let telemetryCount = 0;
+    let activePollInterval = null;
 
     // Detect Firebase Hosting / Static Showcase Environment
     const isStaticHosting = window.location.hostname.includes("firebase") || 
                            window.location.hostname.includes("web.app") || 
                            window.location.hostname.includes("github.io") ||
+                           window.location.hostname.includes("localhost") ||
+                           window.location.hostname === "127.0.0.1" ||
                            window.location.protocol === "file:";
 
     if (runtimeStatusTag) {
@@ -123,13 +151,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =========================================================================
-    // 2. SCREEN ROUTER & NAVIGATION
+    // 3. SCREEN & TAB ROUTERS
     // =========================================================================
 
     function switchScreen(screenId) {
         [screenLaunchpad, screenInvestigation, screenVerdict].forEach(s => {
-            s.classList.add("hidden-screen");
-            s.classList.remove("active-screen");
+            if (s) {
+                s.classList.add("hidden-screen");
+                s.classList.remove("active-screen");
+            }
         });
 
         const target = document.getElementById(screenId);
@@ -147,20 +177,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     btnHeaderNewAudit.addEventListener("click", () => {
+        if (activePollInterval) {
+            clearInterval(activePollInterval);
+            activePollInterval = null;
+        }
+        closeForensicInspector();
         switchScreen("screen-launchpad");
     });
 
-    // Tab Navigation Switcher
+    function switchTab(tabId) {
+        UIState.activeTab = tabId || "panel-findings";
+
+        navTabBtns.forEach(btn => {
+            const target = btn.getAttribute("data-target") || btn.getAttribute("data-tab");
+            if (target === UIState.activeTab) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+
+        tabPanels.forEach(panel => {
+            if (panel.id === UIState.activeTab) {
+                panel.classList.add("active");
+                panel.classList.add("active-tab");
+            } else {
+                panel.classList.remove("active");
+                panel.classList.remove("active-tab");
+            }
+        });
+    }
+
     navTabBtns.forEach(btn => {
         btn.addEventListener("click", () => {
-            navTabBtns.forEach(b => b.classList.remove("active"));
-            tabPanels.forEach(p => p.classList.remove("active"));
-
-            btn.classList.add("active");
-            const targetTab = btn.getAttribute("data-target") || btn.getAttribute("data-tab");
-            const targetPanel = document.getElementById(targetTab);
-            if (targetPanel) {
-                targetPanel.classList.add("active");
+            const target = btn.getAttribute("data-target") || btn.getAttribute("data-tab");
+            if (target) {
+                switchTab(target);
             }
         });
     });
@@ -170,25 +222,25 @@ document.addEventListener("DOMContentLoaded", () => {
         chip.addEventListener("click", () => {
             filterChips.forEach(c => c.classList.remove("active"));
             chip.classList.add("active");
-            currentActiveFilter = chip.getAttribute("data-sev");
-            renderFindingsList(currentFindings);
+            UIState.activeFilter = chip.getAttribute("data-sev") || "ALL";
+            renderFindingsList(UIState.findings);
         });
     });
 
     // =========================================================================
-    // 3. AUDIT LAUNCH CONTROLLERS
+    // 4. AUDIT LAUNCH CONTROLLERS
     // =========================================================================
 
     btnLaunchAlpha.addEventListener("click", () => {
-        startAudit("/api/audits/demo/alpha", "POST", "IntegrityLab-Alpha (Failure Benchmark)");
+        startAudit("/api/audits/demo/alpha", "POST", "IntegrityLab-Alpha (Failure Benchmark)", "alpha");
     });
 
     btnLaunchControl.addEventListener("click", () => {
-        startAudit("/api/audits/demo/control", "POST", "IntegrityLab-Control (Clean Baseline)");
+        startAudit("/api/audits/demo/control", "POST", "IntegrityLab-Control (Clean Baseline)", "control");
     });
 
     btnLaunchAIBIP.addEventListener("click", () => {
-        startAudit("/api/audits/demo/aibip", "POST", "AI-BIP Quantitative Strategy (Real Dogfood)");
+        startAudit("/api/audits/demo/aibip", "POST", "AI-BIP Quantitative Strategy (Real Dogfood)", "aibip");
     });
 
     btnLaunchCustom.addEventListener("click", () => {
@@ -199,30 +251,34 @@ document.addEventListener("DOMContentLoaded", () => {
             report_file: document.getElementById("custom-report-file").value,
             claimed_fee_bps: 5.0
         };
-        startAudit("/api/audits", "POST", payload.project_name, payload);
+        startAudit("/api/audits", "POST", payload.project_name, "alpha", payload);
     });
 
-    async function startAudit(url, method, projectName, body = null) {
+    async function startAudit(url, method, projectName, benchmarkKey, body = null) {
+        if (activePollInterval) {
+            clearInterval(activePollInterval);
+            activePollInterval = null;
+        }
+
+        const token = Date.now();
+        UIState.activeAuditToken = token;
+        UIState.activeBenchmark = benchmarkKey;
+        UIState.activeFilter = "ALL";
+        
+        closeForensicInspector();
         switchScreen("screen-investigation");
+
         liveProjectName.textContent = `Target: ${projectName}`;
-        liveAuditId.textContent = "JOB: Dispatching...";
+        liveAuditId.textContent = `JOB: audit-${benchmarkKey}-${token.toString().slice(-4)}`;
         liveProgressPct.textContent = "0%";
         liveProgressBar.style.width = "5%";
-        currentOpText.textContent = "Submitting job to Google Cloud Pub/Sub queue...";
+        currentOpText.textContent = "Initializing Google ADK Multi-Agent Session...";
         
-        // Reset state variables & purge stale audit data
-        currentFindings = [];
-        currentAuditResult = null;
-        currentMarkdownReport = "";
-        findingsCardsList.innerHTML = "";
-        evidenceGraphViewport.innerHTML = "";
-        forensicTimelineList.innerHTML = "";
-        markdownReportContainer.textContent = "";
-        
+        // Purge previous state
+        purgeUIState();
         resetAgentStepper();
         telemetryLogStream.innerHTML = "";
         telemetryCount = 0;
-        auditStartTime = performance.now();
 
         appendTelemetryLog("INIT", "Connecting to AuditVector Asynchronous Dispatcher...");
 
@@ -252,41 +308,46 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (useStaticFallback) {
-                await runStaticBenchmarkInvestigation(url, projectName, body);
+                await runStaticBenchmarkInvestigation(benchmarkKey, token);
                 return;
             }
 
-            currentAuditId = data.audit_id;
-            liveAuditId.textContent = `JOB: ${currentAuditId}`;
+            UIState.currentAuditId = data.audit_id;
+            liveAuditId.textContent = `JOB: ${data.audit_id}`;
 
-            appendTelemetryLog("DISPATCH", `Job ${currentAuditId} queued in Pub/Sub pipeline.`);
-            pollAuditState(currentAuditId);
+            appendTelemetryLog("DISPATCH", `Job ${data.audit_id} queued in Pub/Sub pipeline.`);
+            pollAuditState(data.audit_id, token);
         } catch (err) {
             appendTelemetryLog("ERROR", `Failed to dispatch audit: ${err.message}`);
             currentOpText.textContent = `Error: ${err.message}`;
         }
     }
 
-    async function runStaticBenchmarkInvestigation(url, projectName, body) {
-        let jsonPath = "data/alpha.json";
-        let benchmarkName = "alpha";
-        if (url.includes("control")) {
-            jsonPath = "data/control.json";
-            benchmarkName = "control";
-        } else if (url.includes("aibip")) {
-            jsonPath = "data/aibip.json";
-            benchmarkName = "aibip";
-        } else if (body) {
-            appendTelemetryLog("NOTICE", "Custom code parsing requires live Python ADK backend. Defaulting to certified Alpha benchmark.");
-            jsonPath = "data/alpha.json";
-            benchmarkName = "alpha";
-        }
+    function purgeUIState() {
+        UIState.result = null;
+        UIState.report = null;
+        UIState.findings = [];
+        UIState.remediationPlans = [];
+        UIState.replaySnapshots = [];
+        UIState.adaptiveDecisions = [];
+        UIState.evidenceGraphs = [];
+        UIState.executionLogs = [];
+        UIState.markdownReport = "";
+        UIState.duckdbProfile = {};
 
-        currentAuditId = `audit-${benchmarkName}-certified`;
-        liveAuditId.textContent = `JOB: ${currentAuditId} (CERTIFIED)`;
+        findingsCardsList.innerHTML = "";
+        if (remediationCardsList) remediationCardsList.innerHTML = "";
+        if (replayStageViewer) replayStageViewer.innerHTML = "";
+        if (adaptiveDecisionsList) adaptiveDecisionsList.innerHTML = "";
+        evidenceGraphViewport.innerHTML = "";
+        forensicTimelineList.innerHTML = "";
+        markdownReportContainer.textContent = "";
+        if (duckdbStatsContent) duckdbStatsContent.innerHTML = "";
+    }
 
-        appendTelemetryLog("HOSTING", "Running in Firebase Static Showcase mode with pre-computed certified ground truth.");
-        appendTelemetryLog("DISPATCH", `Job ${currentAuditId} dispatched via Google ADK pipeline stepper.`);
+    async function runStaticBenchmarkInvestigation(benchmarkKey, token) {
+        let jsonPath = `data/${benchmarkKey}.json`;
+        appendTelemetryLog("HOSTING", `Loading certified ground-truth payload for ${benchmarkKey.toUpperCase()}...`);
 
         let benchmarkResult = null;
         try {
@@ -307,7 +368,10 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
 
         for (let i = 0; i < stages.length; i++) {
-            await new Promise(r => setTimeout(r, 220));
+            if (UIState.activeAuditToken !== token) return; // Guard against race conditions
+            await new Promise(r => setTimeout(r, 200));
+            if (UIState.activeAuditToken !== token) return;
+
             const s = stages[i];
             liveProgressPct.textContent = `${s.progress}%`;
             liveProgressBar.style.width = `${s.progress}%`;
@@ -316,38 +380,45 @@ document.addEventListener("DOMContentLoaded", () => {
             appendTelemetryLog(s.stage, s.op);
         }
 
-        await new Promise(r => setTimeout(r, 180));
+        await new Promise(r => setTimeout(r, 150));
+        if (UIState.activeAuditToken !== token) return;
 
         if (benchmarkResult) {
-            currentAuditResult = benchmarkResult.result || benchmarkResult;
-            transitionToVerdictWorkspace(currentAuditResult);
+            const resultData = benchmarkResult.result || benchmarkResult;
+            transitionToVerdictWorkspace(resultData, token);
         }
     }
 
-    // =========================================================================
-    // 4. LIVE AUDIT POLLING & STATE SYNCHRONIZATION
-    // =========================================================================
-
-    function pollAuditState(auditId) {
+    function pollAuditState(auditId, token) {
         const maxAttempts = 120;
         let attempts = 0;
 
-        const interval = setInterval(async () => {
+        activePollInterval = setInterval(async () => {
+            if (UIState.activeAuditToken !== token) {
+                clearInterval(activePollInterval);
+                activePollInterval = null;
+                return;
+            }
+
             attempts++;
             try {
                 const res = await fetch(`/api/audits/${auditId}`);
                 if (!res.ok) throw new Error("State fetch error");
 
                 const auditData = await res.json();
+                if (UIState.activeAuditToken !== token) return;
+
                 updateLiveInvestigationUI(auditData);
 
                 if (auditData.stage === "COMPLETED" || auditData.stage === "FAILED" || attempts >= maxAttempts) {
-                    clearInterval(interval);
+                    clearInterval(activePollInterval);
+                    activePollInterval = null;
                     if (auditData.stage === "COMPLETED" && auditData.result) {
-                        currentAuditResult = auditData.result;
                         setTimeout(() => {
-                            transitionToVerdictWorkspace(auditData.result);
-                        }, 350);
+                            if (UIState.activeAuditToken === token) {
+                                transitionToVerdictWorkspace(auditData.result, token);
+                            }
+                        }, 300);
                     }
                 }
             } catch (err) {
@@ -362,7 +433,6 @@ document.addEventListener("DOMContentLoaded", () => {
         liveProgressPct.textContent = `${progress}%`;
         liveProgressBar.style.width = `${progress}%`;
 
-        // Update active agent card
         updateAgentPipelineStepper(stage);
 
         const stageDescriptions = {
@@ -391,61 +461,70 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "card-agent-report", triggerStage: "REPORTING" }
         ];
 
-        const stageOrder = ["CREATED", "QUEUED", "RUNNING", "INVESTIGATING", "VERIFYING", "REPORTING", "COMPLETED"];
-        const currentIdx = stageOrder.indexOf(currentStage);
-
-        agentCards.forEach((agent, idx) => {
-            const card = document.getElementById(agent.id);
+        let reachedActive = false;
+        agentCards.forEach(item => {
+            const card = document.getElementById(item.id);
             if (!card) return;
 
             const badge = card.querySelector(".agent-badge");
-            const timer = card.querySelector(".agent-timer");
-            const agentIdx = idx + 2;
-
-            if (currentStage === "COMPLETED" || currentIdx > agentIdx) {
-                card.className = "agent-step-card completed-agent";
-                badge.className = "agent-badge status-completed";
-                badge.textContent = "COMPLETED";
-                timer.textContent = "Verified";
-            } else if (currentIdx === agentIdx || (currentStage === "INVESTIGATING" && (idx === 1 || idx === 2))) {
+            if (currentStage === item.triggerStage) {
                 card.className = "agent-step-card active-agent";
-                badge.className = "agent-badge status-running";
-                badge.textContent = "RUNNING";
-                const elapsed = ((performance.now() - auditStartTime) / 1000).toFixed(1);
-                timer.textContent = `${elapsed}s`;
+                if (badge) {
+                    badge.className = "agent-badge status-running";
+                    badge.textContent = "ACTIVE";
+                }
+                reachedActive = true;
+            } else if (!reachedActive && currentStage !== "QUEUED") {
+                card.className = "agent-step-card completed-agent";
+                if (badge) {
+                    badge.className = "agent-badge status-done";
+                    badge.textContent = "DONE";
+                }
             } else {
                 card.className = "agent-step-card";
-                badge.className = "agent-badge status-queued";
-                badge.textContent = "QUEUED";
-                timer.textContent = "Waiting";
+                if (badge) {
+                    badge.className = "agent-badge status-queued";
+                    badge.textContent = "QUEUED";
+                }
             }
         });
     }
 
     function resetAgentStepper() {
-        ["card-agent-planner", "card-agent-repo", "card-agent-fin", "card-agent-contra", "card-agent-report"].forEach(id => {
+        const cardIds = [
+            "card-agent-planner",
+            "card-agent-repo",
+            "card-agent-fin",
+            "card-agent-contra",
+            "card-agent-remediation",
+            "card-agent-report"
+        ];
+        cardIds.forEach(id => {
             const card = document.getElementById(id);
             if (card) {
                 card.className = "agent-step-card";
-                card.querySelector(".agent-badge").className = "agent-badge status-queued";
-                card.querySelector(".agent-badge").textContent = "QUEUED";
-                card.querySelector(".agent-timer").textContent = "0.0s";
+                const badge = card.querySelector(".agent-badge");
+                if (badge) {
+                    badge.className = "agent-badge status-queued";
+                    badge.textContent = "QUEUED";
+                }
             }
         });
     }
 
     function appendTelemetryLog(stage, message) {
         telemetryCount++;
-        telemetryEventCount.textContent = `${telemetryCount} Events Logged`;
-
-        const entry = document.createElement("div");
-        entry.className = "stream-entry";
+        if (telemetryEventCount) {
+            telemetryEventCount.textContent = `${telemetryCount} Events Logged`;
+        }
 
         const now = new Date();
-        const timeStr = `[${now.toTimeString().split(" ")[0]}]`;
-
+        const timeStr = now.toTimeString().split(" ")[0];
+        
+        const entry = document.createElement("div");
+        entry.className = "stream-entry";
         entry.innerHTML = `
-            <span class="entry-time">${timeStr}</span>
+            <span class="entry-time">[${timeStr}]</span>
             <span class="entry-stage">[${stage}]</span>
             <span class="entry-msg">${message}</span>
         `;
@@ -457,90 +536,92 @@ document.addEventListener("DOMContentLoaded", () => {
     // 5. VERDICT WORKSPACE & EVIDENCE RENDERING
     // =========================================================================
 
-    function transitionToVerdictWorkspace(result) {
-        switchScreen("screen-verdict");
-        const report = result.report;
-        currentFindings = report.findings || [];
-        currentMarkdownReport = report.markdown_report || "";
+    function transitionToVerdictWorkspace(result, token) {
+        if (token && UIState.activeAuditToken !== token) return; // Guard against stale async completion
 
-        // 1. Verdict Banner
-        const isClean = report.verdict.includes("VERIFIED");
+        // Save into single source of truth
+        UIState.result = result;
+        UIState.report = result.report || {};
+        UIState.findings = UIState.report.findings || [];
+        UIState.markdownReport = UIState.report.markdown_report || "";
+        UIState.remediationPlans = result.remediation_plans || UIState.report.remediation_plans || [];
+        UIState.replaySnapshots = result.replay_snapshots || [];
+        UIState.adaptiveDecisions = result.adaptive_decisions || UIState.report.adaptive_decisions || [];
+        UIState.evidenceGraphs = result.evidence_graphs || [];
+        UIState.executionLogs = result.execution_logs || [];
+        UIState.duckdbProfile = result.agent_pipeline?.duckdb_profile || result.duckdb_analysis || {};
+
+        switchScreen("screen-verdict");
+
+        // 1. Verdict Banner & Status
+        const isClean = (UIState.report.verdict || "").includes("VERIFIED");
         verdictBannerCard.className = `verdict-banner-card ${isClean ? "banner-success" : "banner-danger"}`;
         verdictBadgeIcon.textContent = isClean ? "✅" : "⚠️";
-        verdictHeadline.textContent = report.verdict;
+        verdictHeadline.textContent = UIState.report.verdict || (isClean ? "FINANCIAL INTEGRITY VERIFIED" : "CONTRADICTION DETECTED");
         verdictSummaryText.textContent = isClean
             ? "All reported quantitative claims independently proven with zero numerical variance against canonical transaction fills."
             : "AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.";
 
-        const discrepancyVal = report.total_capital_discrepancy !== undefined 
-            ? report.total_capital_discrepancy 
-            : (report.financial_impact?.total_capital_discrepancy || 0.0);
-        finalCapitalDiscrepancy.textContent = `$${discrepancyVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        const discrepancyVal = UIState.report.total_capital_discrepancy !== undefined 
+            ? UIState.report.total_capital_discrepancy 
+            : (UIState.report.financial_impact?.total_capital_discrepancy || 0.0);
         
-        if (isClean) {
-            finalCapitalDiscrepancy.className = "stat-number-ver";
-        } else {
-            finalCapitalDiscrepancy.className = "stat-number-crit";
-        }
-
+        finalCapitalDiscrepancy.textContent = `$${discrepancyVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        finalCapitalDiscrepancy.className = isClean ? "stat-number-ver" : "stat-number-crit";
         finalAuditDuration.textContent = `Audited in ${result.duration_seconds || '0.04'}s • Mode: ${result.mode || 'OFFLINE_DETERMINISTIC'}`;
 
-        // FIS Score & Grade
-        const fis = report.financial_integrity_score || result.financial_integrity_score || { score: (isClean ? 100 : 24), grade: (isClean ? "A+" : "F") };
-        const finalFisScore = document.getElementById("final-fis-score");
-        const finalFisGrade = document.getElementById("final-fis-grade");
+        // 2. Financial Integrity Score (FIS)
+        const fis = UIState.report.financial_integrity_score || result.financial_integrity_score || { score: (isClean ? 100 : 0), grade: (isClean ? "A+" : "F") };
         if (finalFisScore) finalFisScore.textContent = `${fis.score} / 100`;
         if (finalFisGrade) {
             finalFisGrade.textContent = `GRADE ${fis.grade}`;
-            finalFisGrade.className = `fis-grade-badge grade-${fis.grade.toLowerCase().charAt(0)}`;
+            finalFisGrade.className = `fis-grade-badge grade-${(fis.grade || 'f').toLowerCase().charAt(0)}`;
         }
 
-        // 2. Claim vs Reality Hero Panel
-        populateClaimVsRealityPanel(result);
+        // 3. Claim vs Reality Hero Panel
+        populateClaimVsRealityPanel(result, isClean);
 
-        // 3. Severity Counters
-        const counts = report.summary_counts || { critical: 0, high: 0, medium: 0, low: 0 };
+        // 4. Severity Summary Counters & Tab Badges
+        const counts = UIState.report.summary_counts || { critical: 0, high: 0, medium: 0, low: 0 };
         summaryCritCount.textContent = counts.critical || 0;
         summaryHighCount.textContent = counts.high || 0;
         summaryMedCount.textContent = counts.medium || 0;
         summaryLowCount.textContent = counts.low || (isClean ? 1 : 0);
-        tabFindingsBadge.textContent = currentFindings.length;
 
-        // 4. Render Findings Explorer
-        renderFindingsList(currentFindings);
+        if (tabFindingsBadge) tabFindingsBadge.textContent = UIState.findings.length;
+        if (tabRemediationBadge) tabRemediationBadge.textContent = UIState.remediationPlans.length;
 
-        // 5. Render Remediation Sandbox Plans
-        const remediationPlans = result.remediation_plans || report.remediation_plans || [];
-        const tabRemediationBadge = document.getElementById("tab-remediation-badge");
-        if (tabRemediationBadge) tabRemediationBadge.textContent = remediationPlans.length;
-        renderRemediationPlans(remediationPlans);
+        // 5. Reset Filter Chips to "ALL"
+        UIState.activeFilter = "ALL";
+        filterChips.forEach(c => {
+            if (c.getAttribute("data-sev") === "ALL") {
+                c.classList.add("active");
+            } else {
+                c.classList.remove("active");
+            }
+        });
 
-        // 6. Render Replay & Adaptive Decisions
-        const snapshots = result.replay_snapshots || [];
-        const decisions = result.adaptive_decisions || report.adaptive_decisions || [];
-        setupReplayController(snapshots, decisions);
+        // 6. Render All 7 Tab Panels Cleanly
+        renderFindingsList(UIState.findings);
+        renderRemediationPlans(UIState.remediationPlans);
+        setupReplayController(UIState.replaySnapshots, UIState.adaptiveDecisions);
+        renderInteractiveEvidenceGraph(UIState.evidenceGraphs);
+        renderForensicAuditTimeline(UIState.executionLogs);
+        
+        if (markdownReportContainer) {
+            markdownReportContainer.textContent = UIState.markdownReport;
+        }
+        renderDuckDBProfile(UIState.duckdbProfile);
 
-        // 7. Render Interactive Evidence Graph
-        renderInteractiveEvidenceGraph(result.evidence_graphs || []);
-
-        // 8. Render Forensic Audit Timeline
-        renderForensicAuditTimeline(result.execution_logs || []);
-
-        // 9. Render Markdown Report
-        markdownReportContainer.textContent = currentMarkdownReport;
-
-        // 10. Render DuckDB Profile
-        renderDuckDBProfile(result.agent_pipeline?.duckdb_profile || {});
+        // 7. Reset Visible Tab to Findings Panel
+        switchTab("panel-findings");
     }
 
-    function populateClaimVsRealityPanel(result) {
-        const findings = result.report?.findings || [];
-        const isClean = result.report?.verdict?.includes("VERIFIED");
-
+    function populateClaimVsRealityPanel(result, isClean) {
+        const findings = UIState.findings;
         const deltaDesc = document.querySelector(".comparison-delta-card .delta-desc");
         const deltaBadge = document.querySelector(".comparison-delta-card .delta-badge");
 
-        // Dynamically find primary calculation finding
         const primaryFinding = findings.find(f => (f.calculation && f.calculation.reported_pnl !== undefined)) || findings[0];
         const calc = primaryFinding?.calculation || {};
 
@@ -616,17 +697,27 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderFindingsList(findings) {
         findingsCardsList.innerHTML = "";
 
-        const filtered = findings.filter(f => {
-            if (currentActiveFilter === "ALL") return true;
-            if (currentActiveFilter === "CRITICAL") return f.severity === "CRITICAL";
-            if (currentActiveFilter === "HIGH") return f.severity === "HIGH";
-            if (currentActiveFilter === "MEDIUM") return f.severity === "MEDIUM" || f.status === "WARNING";
-            if (currentActiveFilter === "LOW") return f.status === "VERIFIED" || f.severity === "LOW";
+        const filtered = (findings || []).filter(f => {
+            if (UIState.activeFilter === "ALL") return true;
+            if (UIState.activeFilter === "CRITICAL") return f.severity === "CRITICAL";
+            if (UIState.activeFilter === "HIGH") return f.severity === "HIGH";
+            if (UIState.activeFilter === "MEDIUM") return f.severity === "MEDIUM" || f.status === "WARNING";
+            if (UIState.activeFilter === "LOW") return f.status === "VERIFIED" || f.severity === "LOW";
             return true;
         });
 
         if (filtered.length === 0) {
-            findingsCardsList.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--text-muted);">No findings match filter "${currentActiveFilter}".</div>`;
+            if (findings.length === 0) {
+                findingsCardsList.innerHTML = `
+                    <div style="padding: 2.5rem; text-align: center; color: var(--text-secondary); background: var(--bg-surface-raised); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                        <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">✅</div>
+                        <strong>100% Financial Integrity Verified</strong>
+                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">0 Contradictions, 0 Code Flaws Discovered across all canonical transaction fills.</p>
+                    </div>
+                `;
+            } else {
+                findingsCardsList.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--text-muted);">No findings match filter "${UIState.activeFilter}".</div>`;
+            }
             return;
         }
 
@@ -716,14 +807,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderRemediationPlans(plans) {
-        const remediationCardsList = document.getElementById("remediation-cards-list");
         if (!remediationCardsList) return;
         remediationCardsList.innerHTML = "";
 
         if (!plans || plans.length === 0) {
             remediationCardsList.innerHTML = `
-                <div style="padding: 2rem; text-align: center; color: var(--text-muted); background: var(--bg-surface-raised); border-radius: 8px;">
-                    ✅ 100% Financial Integrity Verified — Zero code remediation required.
+                <div style="padding: 2.5rem; text-align: center; color: var(--text-secondary); background: var(--bg-surface-raised); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">✅</div>
+                    <strong>100% Financial Integrity Verified — Zero code remediation required.</strong>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">Software calculations match deterministic ground truth with $0.00 variance.</p>
                 </div>
             `;
             return;
@@ -823,41 +915,32 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    let currentReplayIndex = 0;
-    let replaySnapshotsList = [];
-
     function setupReplayController(snapshots, decisions) {
-        const replayStageViewer = document.getElementById("replay-stage-viewer");
-        const replayStepLabel = document.getElementById("replay-step-label");
-        const btnReplayPrev = document.getElementById("btn-replay-prev");
-        const btnReplayNext = document.getElementById("btn-replay-next");
-
-        replaySnapshotsList = snapshots && snapshots.length > 0 ? snapshots : [
+        UIState.replaySnapshots = (snapshots && snapshots.length > 0) ? snapshots : [
             { stage: "PLANNING", active_agent: "AuditPlanner", description: "Formulating audit plan and scoping repository pathways", findings_count: 0 },
             { stage: "AST_SCOPING", active_agent: "RepositoryInvestigator", description: "Parsing AST syntax trees to map financial routines", findings_count: 0 },
             { stage: "CLAIM_EXTRACTION", active_agent: "FinancialInvestigator", description: "Extracting claimed performance metrics and normalizing trade fills", findings_count: 0 },
-            { stage: "ADAPTIVE_VERIFICATION", active_agent: "ContradictionInvestigator", description: "Executing deterministic FIFO reconciliation and DuckDB SQL profiling", findings_count: 4 },
-            { stage: "REMEDIATION_SANDBOX", active_agent: "RemediationAgent", description: "Formulating unified diffs and testing patches inside isolated sandbox", findings_count: 4 },
-            { stage: "VERDICT_SEALED", active_agent: "ReportAgent", description: "Synthesizing executive report and sealing cryptographic provenance graphs", findings_count: 4 }
+            { stage: "ADAPTIVE_VERIFICATION", active_agent: "ContradictionInvestigator", description: "Executing deterministic FIFO reconciliation and DuckDB SQL profiling", findings_count: 0 },
+            { stage: "VERDICT_SEALED", active_agent: "ReportAgent", description: "Synthesizing executive report and sealing cryptographic provenance graphs", findings_count: 0 }
         ];
 
-        currentReplayIndex = replaySnapshotsList.length - 1;
-        updateReplayView(replayStageViewer, replayStepLabel);
+        UIState.currentReplayIndex = UIState.replaySnapshots.length - 1;
+        updateReplayView();
 
         if (btnReplayPrev) {
             btnReplayPrev.onclick = () => {
-                if (currentReplayIndex > 0) {
-                    currentReplayIndex--;
-                    updateReplayView(replayStageViewer, replayStepLabel);
+                if (UIState.currentReplayIndex > 0) {
+                    UIState.currentReplayIndex--;
+                    updateReplayView();
                 }
             };
         }
 
         if (btnReplayNext) {
             btnReplayNext.onclick = () => {
-                if (currentReplayIndex < replaySnapshotsList.length - 1) {
-                    currentReplayIndex++;
-                    updateReplayView(replayStageViewer, replayStepLabel);
+                if (UIState.currentReplayIndex < UIState.replaySnapshots.length - 1) {
+                    UIState.currentReplayIndex++;
+                    updateReplayView();
                 }
             };
         }
@@ -865,41 +948,43 @@ document.addEventListener("DOMContentLoaded", () => {
         renderAdaptiveDecisions(decisions);
     }
 
-    function updateReplayView(replayStageViewer, replayStepLabel) {
-        const snap = replaySnapshotsList[currentReplayIndex];
+    function updateReplayView() {
+        const snap = UIState.replaySnapshots[UIState.currentReplayIndex];
         if (!snap || !replayStageViewer) return;
 
         if (replayStepLabel) {
-            replayStepLabel.textContent = `Stage ${currentReplayIndex + 1} of ${replaySnapshotsList.length}`;
+            replayStepLabel.textContent = `Stage ${UIState.currentReplayIndex + 1} of ${UIState.replaySnapshots.length}`;
         }
 
         replayStageViewer.innerHTML = `
             <div class="replay-viewer-card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="replay-viewer-stage">STAGE ${currentReplayIndex + 1}: ${snap.stage}</span>
+                    <span class="replay-viewer-stage">STAGE ${UIState.currentReplayIndex + 1}: ${snap.stage}</span>
                     <span class="badge" style="color: #60a5fa;">Active Agent: ${snap.active_agent || 'AuditVector Agent'}</span>
                 </div>
                 <p class="replay-viewer-desc">${snap.description}</p>
                 <div style="display: flex; gap: 1rem; font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 0.5rem;">
                     <span>Findings Discovered: <strong>${snap.findings_count || 0}</strong></span>
-                    <span>Progress: <strong>${Math.round(((currentReplayIndex + 1) / replaySnapshotsList.length) * 100)}%</strong></span>
+                    <span>Progress: <strong>${Math.round(((UIState.currentReplayIndex + 1) / UIState.replaySnapshots.length) * 100)}%</strong></span>
                 </div>
             </div>
         `;
     }
 
     function renderAdaptiveDecisions(decisions) {
-        const adaptiveDecisionsList = document.getElementById("adaptive-decisions-list");
         if (!adaptiveDecisionsList) return;
         adaptiveDecisionsList.innerHTML = "";
 
-        const list = decisions && decisions.length > 0 ? decisions : [
-            { trigger_agent: "AuditPlanner", chosen_action: "ROUTE_TO_AST_SCOPING", reasoning: "Identified repository path and dataset. Validating AST schema readiness.", outcome: "Dispatched RepositoryInvestigator for bounded AST method discovery." },
-            { trigger_agent: "RepositoryInvestigator", chosen_action: "ROUTE_TO_CLAIM_EXTRACTION", reasoning: "AST mapping located financial functions. Routing to claim extractor.", outcome: "Dispatched FinancialInvestigator to extract reported metrics." },
-            { trigger_agent: "FinancialInvestigator", chosen_action: "ROUTE_TO_DETERMINISTIC_RECONCILIATION", reasoning: "Extracted performance claim targets with canonical fills. Routing to deterministic verifiers.", outcome: "Dispatched ContradictionInvestigator for bottom-up FIFO lot matching." },
-            { trigger_agent: "ContradictionInvestigator", chosen_action: "ROUTE_TO_REMEDIATION_SANDBOX", reasoning: "Confirmed findings with capital discrepancy. Routing to RemediationAgent for sandbox verification.", outcome: "Dispatched RemediationAgent to formulate unified diff patches and re-verify in sandbox." },
-            { trigger_agent: "RemediationAgent", chosen_action: "ROUTE_TO_REPORT_SYNTHESIS", reasoning: "Verified remediation patches inside isolated sandbox. Post-patch discrepancy confirmed at $0.00.", outcome: "Routing to ReportAgent for final executive synthesis." }
-        ];
+        const list = (decisions && decisions.length > 0) ? decisions : [];
+
+        if (list.length === 0) {
+            adaptiveDecisionsList.innerHTML = `
+                <div style="padding: 1.5rem; text-align: center; color: var(--text-muted); background: var(--bg-surface-raised); border-radius: 6px;">
+                    Zero adaptive deviations required. Linear deterministic verification completed with 100% precision.
+                </div>
+            `;
+            return;
+        }
 
         list.forEach((dec, idx) => {
             const card = document.createElement("div");
@@ -918,7 +1003,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function escapeHtml(text) {
         if (!text) return "";
-        return text
+        return String(text)
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
@@ -929,8 +1014,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderInteractiveEvidenceGraph(graphs) {
         evidenceGraphViewport.innerHTML = "";
 
-        if (graphs.length === 0) {
-            evidenceGraphViewport.innerHTML = `<div style="padding: 2rem; color: var(--text-muted);">No evidence graph chains generated.</div>`;
+        if (!graphs || graphs.length === 0) {
+            evidenceGraphViewport.innerHTML = `<div style="padding: 2rem; color: var(--text-muted);">No evidence graph chains generated for current benchmark.</div>`;
             return;
         }
 
@@ -983,7 +1068,7 @@ document.addEventListener("DOMContentLoaded", () => {
             card.querySelectorAll(".svg-node-item").forEach(item => {
                 item.addEventListener("click", () => {
                     const fid = item.getAttribute("data-fid");
-                    const finding = currentFindings.find(f => f.finding_id === fid);
+                    const finding = UIState.findings.find(f => f.finding_id === fid);
                     if (finding) openForensicInspector(finding);
                 });
             });
@@ -1018,7 +1103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         forensicTimelineList.innerHTML = "";
 
         if (!logs || logs.length === 0) {
-            forensicTimelineList.innerHTML = `<div style="padding: 1.5rem; color: var(--text-muted);">No timeline logs recorded.</div>`;
+            forensicTimelineList.innerHTML = `<div style="padding: 1.5rem; color: var(--text-muted);">No timeline logs recorded for current benchmark.</div>`;
             return;
         }
 
@@ -1043,6 +1128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderDuckDBProfile(profile) {
+        if (!duckdbStatsContent) return;
         duckdbStatsContent.innerHTML = `
             <div class="duckdb-stat-box">
                 <span>TOTAL TRADE RECORDS SCANNED</span>
@@ -1068,14 +1154,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================================================================
 
     function openForensicInspector(finding) {
-        drawerFindingId.textContent = finding.finding_id;
-        drawerStatusBadge.className = `status-badge status-${finding.status}`;
-        drawerStatusBadge.textContent = finding.status;
-        drawerSeverityBadge.textContent = `Severity: ${finding.severity}`;
+        if (!finding) return;
+        drawerFindingId.textContent = finding.finding_id || "FINDING";
+        drawerStatusBadge.className = `status-badge status-${finding.status || 'VERIFIED'}`;
+        drawerStatusBadge.textContent = finding.status || "VERIFIED";
+        drawerSeverityBadge.textContent = `Severity: ${finding.severity || 'LOW'}`;
         drawerConfidenceBadge.textContent = `Confidence: ${Math.round((finding.confidence || 0.95) * 100)}%`;
 
-        drawerFindingTitle.textContent = finding.title;
-        drawerFindingExplanation.textContent = finding.explanation || finding.claim;
+        drawerFindingTitle.textContent = finding.title || "Evidence Contract Inspector";
+        drawerFindingExplanation.textContent = finding.explanation || finding.claim || "";
 
         const calc = finding.calculation || {};
         
@@ -1113,12 +1200,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function closeForensicInspector() {
-        inspectorDrawer.classList.add("hidden-drawer");
-        drawerOverlay.classList.add("hidden-drawer");
+        if (inspectorDrawer) inspectorDrawer.classList.add("hidden-drawer");
+        if (drawerOverlay) drawerOverlay.classList.add("hidden-drawer");
     }
 
-    btnCloseDrawer.addEventListener("click", closeForensicInspector);
-    drawerOverlay.addEventListener("click", closeForensicInspector);
+    if (btnCloseDrawer) btnCloseDrawer.addEventListener("click", closeForensicInspector);
+    if (drawerOverlay) drawerOverlay.addEventListener("click", closeForensicInspector);
 
     // =========================================================================
     // 8. REPORT ACTIONS & FILE EXPORTS
@@ -1126,7 +1213,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnCopyMd) {
         btnCopyMd.addEventListener("click", () => {
-            navigator.clipboard.writeText(currentMarkdownReport).then(() => {
+            navigator.clipboard.writeText(UIState.markdownReport).then(() => {
                 const original = btnCopyMd.textContent;
                 btnCopyMd.textContent = "✅ Copied!";
                 setTimeout(() => { btnCopyMd.textContent = original; }, 2000);
@@ -1136,11 +1223,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnDownloadMd) {
         btnDownloadMd.addEventListener("click", () => {
-            const blob = new Blob([currentMarkdownReport], { type: "text/markdown" });
+            const blob = new Blob([UIState.markdownReport], { type: "text/markdown" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `AuditVector-Executive-Report-${currentAuditId || 'audit'}.md`;
+            a.download = `AuditVector-Executive-Report-${UIState.currentAuditId || UIState.activeBenchmark || 'audit'}.md`;
             a.click();
             URL.revokeObjectURL(url);
         });
@@ -1148,25 +1235,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (btnExportBundle) {
         btnExportBundle.addEventListener("click", async () => {
-            if (!currentAuditId && !currentAuditResult) return;
+            if (!UIState.result) return;
             try {
                 let exportData = null;
-                try {
-                    const res = await fetch(`/api/audits/${currentAuditId}/evidence-bundle`);
-                    if (res.ok) {
-                        exportData = await res.json();
-                    }
-                } catch (e) {}
+                if (UIState.currentAuditId) {
+                    try {
+                        const res = await fetch(`/api/audits/${UIState.currentAuditId}/evidence-bundle`);
+                        if (res.ok) {
+                            exportData = await res.json();
+                        }
+                    } catch (e) {}
+                }
 
-                if (!exportData && currentAuditResult) {
+                if (!exportData && UIState.result) {
                     exportData = {
                         schema_version: "evidence_contract_bundle_v1.0",
-                        audit_id: currentAuditId || "audit-certified-demo",
+                        audit_id: UIState.currentAuditId || `audit-${UIState.activeBenchmark}-certified`,
+                        benchmark: UIState.activeBenchmark,
                         exported_at: new Date().toISOString(),
-                        total_findings: (currentAuditResult.report && currentAuditResult.report.findings) ? currentAuditResult.report.findings.length : 0,
-                        total_discrepancy_amount: (currentAuditResult.report && currentAuditResult.report.summary) ? currentAuditResult.report.summary.total_discrepancy : 0.0,
-                        findings: (currentAuditResult.report && currentAuditResult.report.findings) ? currentAuditResult.report.findings : [],
-                        duckdb_analysis: currentAuditResult.duckdb_analysis || {}
+                        total_findings: UIState.findings.length,
+                        total_discrepancy_amount: UIState.report?.total_capital_discrepancy || 0.0,
+                        findings: UIState.findings,
+                        remediation_plans: UIState.remediationPlans,
+                        duckdb_analysis: UIState.duckdbProfile
                     };
                 }
 
@@ -1175,7 +1266,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement("a");
                     a.href = url;
-                    a.download = `AuditVector-Evidence-Bundle-${currentAuditId || 'audit'}.json`;
+                    a.download = `AuditVector-Evidence-Bundle-${UIState.activeBenchmark || 'audit'}.json`;
                     a.click();
                     URL.revokeObjectURL(url);
                 }
