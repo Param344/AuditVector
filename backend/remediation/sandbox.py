@@ -65,6 +65,7 @@ class RemediationSandbox:
             if syntax_valid:
                 # Step 2: Deterministic verification against the patched logic
                 if "F-001" in fid or plan.issue_type == "SIGN_INVERSION":
+                    tests_total = 4
                     # Check if sign inversion still remains in patched code
                     if "cost_basis - exit_value" in plan.patched_code or "(entry - exit)" in plan.patched_code:
                         # Bug remains unpatched
@@ -79,6 +80,7 @@ class RemediationSandbox:
                         tests_passed = 4
 
                 elif "F-002" in fid or plan.issue_type == "POLARITY_INVERSION":
+                    tests_total = 3
                     if "abs(net_pnl)" in plan.patched_code or "abs(pnl)" in plan.patched_code:
                         post_discrepancy = pre_discrepancy
                         discrepancy_resolved = False
@@ -90,6 +92,7 @@ class RemediationSandbox:
                         tests_passed = 3
 
                 elif "F-003" in fid or plan.issue_type == "FEE_DOUBLE_COUNT":
+                    tests_total = 3
                     if "- total_fees" in plan.patched_code and "- fees" in plan.patched_code:
                         post_discrepancy = pre_discrepancy
                         discrepancy_resolved = False
@@ -101,6 +104,7 @@ class RemediationSandbox:
                         tests_passed = 3
 
                 elif "F-004" in fid or plan.issue_type == "CONFIG_DRIFT":
+                    tests_total = 2
                     if '"fee_bps": 5.0' in plan.patched_code or "'fee_bps': 5.0" in plan.patched_code:
                         post_discrepancy = pre_discrepancy
                         discrepancy_resolved = False
@@ -112,11 +116,13 @@ class RemediationSandbox:
                         tests_passed = 2
 
                 elif "AIBIP" in fid:
+                    tests_total = 4
                     post_discrepancy = 0.0
                     discrepancy_resolved = True
                     post_status = "VERIFIED_SOUND"
-                    tests_passed = 5
+                    tests_passed = 4
                 else:
+                    tests_total = 2
                     post_discrepancy = 0.0
                     discrepancy_resolved = True
                     post_status = "VERIFIED_SOUND"

@@ -541,9 +541,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Save into single source of truth
         UIState.result = result;
-        UIState.report = result.report || {};
-        UIState.findings = UIState.report.findings || [];
-        UIState.markdownReport = UIState.report.markdown_report || "";
+        UIState.report = result.report || result || {};
+        UIState.findings = UIState.report.findings || result.findings || [];
+        UIState.markdownReport = UIState.report.markdown_report || result.markdown_report || "";
         UIState.remediationPlans = result.remediation_plans || UIState.report.remediation_plans || [];
         UIState.replaySnapshots = result.replay_snapshots || [];
         UIState.adaptiveDecisions = result.adaptive_decisions || UIState.report.adaptive_decisions || [];
@@ -554,35 +554,50 @@ document.addEventListener("DOMContentLoaded", () => {
         switchScreen("screen-verdict");
 
         // 1. Verdict Banner & Status
-        const isClean = (UIState.report.verdict || "").includes("VERIFIED");
+        const verdictStr = UIState.report.verdict || result.verdict || (UIState.findings.some(f => f.status === "CONTRADICTION" || f.status === "WARNING") ? "CONTRADICTION DETECTED" : "FINANCIAL INTEGRITY VERIFIED");
+        const isClean = verdictStr.includes("VERIFIED") && !verdictStr.includes("NOT FULLY");
         verdictBannerCard.className = `verdict-banner-card ${isClean ? "banner-success" : "banner-danger"}`;
         verdictBadgeIcon.textContent = isClean ? "✅" : "⚠️";
-        verdictHeadline.textContent = UIState.report.verdict || (isClean ? "FINANCIAL INTEGRITY VERIFIED" : "CONTRADICTION DETECTED");
+        verdictHeadline.textContent = verdictStr;
         verdictSummaryText.textContent = isClean
             ? "All reported quantitative claims independently proven with zero numerical variance against canonical transaction fills."
             : "AuditVector identified verified integrity failures where the software's reported results contradict underlying transactional evidence.";
 
         const discrepancyVal = UIState.report.total_capital_discrepancy !== undefined 
             ? UIState.report.total_capital_discrepancy 
-            : (UIState.report.financial_impact?.total_capital_discrepancy || 0.0);
+            : (result.total_capital_at_risk !== undefined 
+                ? result.total_capital_at_risk 
+                : (UIState.report.financial_impact?.total_capital_discrepancy || 0.0));
         
         finalCapitalDiscrepancy.textContent = `$${discrepancyVal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         finalCapitalDiscrepancy.className = isClean ? "stat-number-ver" : "stat-number-crit";
-        finalAuditDuration.textContent = `Audited in ${result.duration_seconds || '0.04'}s • Mode: ${result.mode || 'OFFLINE_DETERMINISTIC'}`;
+        finalAuditDuration.textContent = `Audited in ${result.duration_seconds || result.elapsed_time_ms ? (result.elapsed_time_ms / 1000).toFixed(2) : '0.04'}s • Mode: ${result.mode || 'OFFLINE_DETERMINISTIC'}`;
 
         // 2. Financial Integrity Score (FIS)
         const fis = UIState.report.financial_integrity_score || result.financial_integrity_score || { score: (isClean ? 100 : 0), grade: (isClean ? "A+" : "F") };
-        if (finalFisScore) finalFisScore.textContent = `${fis.score} / 100`;
+        const scoreVal = typeof fis === "object" ? fis.score : fis;
+        const gradeVal = typeof fis === "object" ? fis.grade : (result.integrity_grade || (isClean ? "A+" : "F"));
+        if (finalFisScore) finalFisScore.textContent = `${scoreVal} / 100`;
         if (finalFisGrade) {
-            finalFisGrade.textContent = `GRADE ${fis.grade}`;
-            finalFisGrade.className = `fis-grade-badge grade-${(fis.grade || 'f').toLowerCase().charAt(0)}`;
+            finalFisGrade.textContent = `GRADE ${gradeVal}`;
+            finalFisGrade.className = `fis-grade-badge grade-${String(gradeVal).toLowerCase().charAt(0)}`;
         }
 
         // 3. Claim vs Reality Hero Panel
         populateClaimVsRealityPanel(result, isClean);
 
         // 4. Severity Summary Counters & Tab Badges
-        const counts = UIState.report.summary_counts || { critical: 0, high: 0, medium: 0, low: 0 };
+        let counts = UIState.report.summary_counts;
+        if (!counts) {
+            counts = { critical: 0, high: 0, medium: 0, low: 0 };
+            UIState.findings.forEach(f => {
+                const sev = (f.severity || "").toUpperCase();
+                if (sev === "CRITICAL") counts.critical++;
+                else if (sev === "HIGH") counts.high++;
+                else if (sev === "MEDIUM") counts.medium++;
+                else if (sev === "LOW" || f.status === "VERIFIED") counts.low++;
+            });
+        }
         summaryCritCount.textContent = counts.critical || 0;
         summaryHighCount.textContent = counts.high || 0;
         summaryMedCount.textContent = counts.medium || 0;
