@@ -1,83 +1,150 @@
-# Devpost Submission — AUDITVECTOR 🛡️
+# 🛡️ AuditVector — Devpost Submission Story
 
-**Tagline:** Autonomous Financial Integrity Investigator: AI reasons. Code proves. Evidence explains.  
-**Track:** Taskmaster  
-**Hackathon:** All Things Agentic Hackathon  
-
----
-
-## 💡 Inspiration
-
-In quantitative trading and algorithmic finance, software errors rarely trigger noisy crashes. Instead, they produce **silent financial integrity decay**:
-* An inverted subtraction sign `(start_capital - end_capital)` disguises catastrophic drawdowns as profitable quarters.
-* Commission rates are subtracted at execution and mistakenly subtracted a second time during portfolio rollups.
-* Backtesting configurations claim a 5 bps fee tier while production engines execute at 13+ bps.
-
-When financial engineers try using generative AI to audit quantitative code, they run into a fatal wall: **LLMs hallucinate arithmetic.** Asking a standard LLM whether a trading strategy's PnL is correct across 50,000 order fills yields fabricated numbers and false confidence.
-
-We built **AuditVector** to solve this integrity gap. AuditVector is an autonomous multi-agent financial investigator that operates on one core principle:
-$$\mathbf{AI\ reasons.\ Code\ proves.\ Evidence\ explains.}$$
+> **Tagline:** Autonomous financial integrity agent that investigates trading systems, proves hidden calculation errors deterministically, and delivers cryptographic evidence without letting AI fabricate the numbers.  
+> **Track:** The Taskmaster — All Things Agentic Hackathon  
+> **Live Interactive Demo:** [https://auditvector-20610.web.app](https://auditvector-20610.web.app)  
+> **GitHub Repository:** [https://github.com/Param344/AuditVector.git](https://github.com/Param344/AuditVector.git)
 
 ---
 
-## 🚀 What It Does
+## Inspiration
 
-AuditVector takes a financial strategy repository, execution logs, and trade data, and autonomously:
-1. **Maps Financial Pathways**: Uses bounded AST parsing to trace where PnL, inventory, fees, and returns are computed.
-2. **Extracts Reported Claims**: Identifies self-reported backtest and live metrics (Net PnL, Return %, Fees, Win Rate).
-3. **Executes Deterministic Re-computations**: Independently reconstructs PnL from raw trade events using a bottom-up Python FIFO lot matcher and DuckDB analytical query engine.
-4. **Detects Contradictions & Quantifies Capital-at-Risk**: Identifies sign inversions, fee double-counting, and rate mismatches, assigning official statuses (`VERIFIED`, `CONTRADICTION`, `WARNING`, `UNVERIFIABLE`).
-5. **Generates Cryptographic Evidence Graphs**: Enforces strict **Evidence Contracts** (`No Evidence Contract → No Verified Finding`), linking every claim back to exact code lines, transaction hashes, normalizer versions, and verifier algorithms.
-6. **Produces Executive Audit Reports**: Delivers a human-verifiable report with dollar discrepancies, severity breakdowns, and actionable remediation steps.
+I built AuditVector from a simple concern:
 
----
+**Financial software can be wrong while still looking completely correct.**
 
-## 🏗️ How We Built It
+When working with quantitative systems, I saw how easily a small mathematical or logic error can become a large financial mistake — a reversed sign, fees being counted twice, a mismatch between configuration and execution, or a backtest reporting results that the underlying trades cannot actually support.
 
-AuditVector's architecture is organized into three distinct layers:
+What bothered me most was that AI could explain financial data very well, but an explanation is not proof.
 
-### 1. Agentic Reasoning Layer
-* Built with official **Google ADK 2.7** (`google.adk.agents.Agent`) and **Gemini 3.5 Flash**.
-* Specialized 5-Agent Pipeline:
-  * **Audit Planner**: Scopes directories and plans investigation targets.
-  * **Repository Investigator**: Bounded AST parser identifying financial calculation functions without leaking entire codebases to the LLM.
-  * **Financial Investigator**: Extracts reported claims into typed verification targets.
-  * **Contradiction Investigator**: Invokes deterministic tools and formulates Evidence Contracts.
-  * **Report Agent**: Synthesizes verified findings into executive reports.
+That led to the idea behind AuditVector:
 
-### 2. Deterministic Verification Engine
-* **Python FIFO Lot Matcher**: Dual-direction lot reconstruction for Longs, Shorts, Partial Fills, and Multi-Asset Portfolios.
-* **DuckDB SQL Engine**: In-memory tabular analytical queries for fast trade profiling and symbol distribution.
-* **Secret Redactor**: Automatically sanitizes API keys, Binance credentials, AWS keys, and private keys before LLM exposure.
+> **What if an AI agent could investigate a financial system autonomously, but every important numerical conclusion had to be proven by deterministic code?**
 
-### 3. Asynchronous Cloud Runtime & Persistent State
-* **Google Cloud Run**: Containerized FastAPI REST API and static dashboard server.
-* **Google Cloud Pub/Sub**: Asynchronous job dispatcher with strict idempotency guards against duplicate message delivery.
-* **Google Cloud Firestore**: Persistent state management tracking the audit lifecycle (`QUEUED → RUNNING → INVESTIGATING → VERIFYING → REPORTING → COMPLETED`).
+That became our core principle:
+
+**AI reasons. Code proves. Evidence explains.**
 
 ---
 
-## 🔬 Testing & Validation
+## What it does
 
-* **IntegrityLab Synthetic Benchmark**: A controlled financial testbed with 4 planted integrity bugs + 1 clean control case (confirming 0 false positive fabrications).
-* **AI-BIP Real-World Dogfooding**: Audited our live multi-asset quant engine across BTC, ETH, SOL, and AVAX, discovering a $16,286 calculation discrepancy from unmodeled execution slippage.
-* **Test Suite**: **55 comprehensive unit, integration, and API test suites** passing with 100% success.
+AuditVector is an **autonomous financial integrity investigation and remediation agent** designed to find and safely remediate hidden mathematical and logic failures in quantitative trading and financial software.
+
+It investigates a repository together with its financial reports, configuration, source code, and raw transaction data.
+
+The agent can:
+
+* **Map financial logic** inside source code using AST analysis
+* **Extract reported PnL, returns, fees**, and configuration claims
+* **Reconstruct financial results independently** from raw trade fills
+* **Perform deterministic FIFO lot reconciliation** and DuckDB SQL tabular profiling
+* **Detect PnL and return polarity reversals**, fee double-counting, and configuration drift
+* **Compute a Financial Integrity Score (FIS)** from 0–100 with grades A+ to F
+* **Formulate surgical unified-diff remediation patches**
+* **Execute isolated sandbox re-verification** to prove candidate patches reduce discrepancy to $0.00 before touching the real repository
+* **Enforce a strict human-in-the-loop safety boundary** before applying patches
+* **Enable interactive "WHY?" evidence provenance traversal** from a finding to its underlying transaction and source evidence
+* **Create sealed cryptographic evidence contracts** and provenance graphs
+* **Support step-by-step Audit Replay** with an adaptive ADK decision log
+* **Produce an executive forensic report** ready for risk and compliance review
+
+The key architectural invariant is:
+
+**The LLM never calculates the financial numbers.**
+
+AI investigates, hypothesizes, and scopes pathways. Deterministic verifiers and isolated execution sandboxes perform the actual mathematics and regression verification.
+
+This creates a closed-loop workflow:
+
+$$\text{Investigate} \longrightarrow \text{Prove} \longrightarrow \text{Explain} \longrightarrow \text{Remediate} \longrightarrow \text{Sandbox-Verify} \longrightarrow \text{Human Approval}$$
 
 ---
 
-## 🏆 Accomplishments that We're Proud Of
+## How we built it
 
-1. **Zero Arithmetic Hallucinations**: Financial numbers are never accepted from LLM reasoning; every numerical verdict is grounded by deterministic code execution.
-2. **True Google ADK & Gemini 3.5 Implementation**: Built using official Google ADK agents and tools with full offline hermetic test mode support.
-3. **Real Cloud Asynchronous Runtime**: Scalable Pub/Sub and Firestore state machine handling long-running audits without timing out HTTP connections.
-4. **Interactive Provenance Evidence Graph**: Visual node-and-edge chains enabling risk managers to verify the math from source code to trade fill.
+AuditVector is built around **Google ADK (Agent Development Kit)** and **Gemini 3.5 Flash**, with an evidence-driven adaptive orchestration loop.
+
+The investigation flows through six specialized agents:
+
+**Audit Planner → Repository Investigator → Financial Investigator → Contradiction Investigator → Remediation Agent → Report Agent**
+
+Underneath the agents is a deterministic verification layer built in Python and DuckDB:
+
+* **Canonical Normalization:** Ingests raw trades into a strictly typed `FinancialEvent` model.
+* **Deterministic FIFO Recalculator:** Independently reconstructs multi-symbol positions, realized PnL, fees, and cash flows from canonical trade fills.
+* **Evidence-Driven Adaptive Loop:** After each investigation step, an ADK decision component evaluates the available evidence and dynamically routes to the appropriate investigation, tool, or verifier.
+* **Isolated Remediation Sandbox:** Generates minimal unified diffs and executes semantic regression checks in a safe temporary environment before any real repository modification.
+* **Cryptographic Provenance:** Seals each finding with SHA-256 dataset hashes, AST source citations, and verifier engine metadata.
+
+We evaluated AuditVector across three complementary benchmarks:
+
+1. **IntegrityLab Alpha:** A flawed quantitative repository containing four planted financial contradictions. AuditVector detected all four and quantified **$44,276.75 of capital at risk**.
+2. **IntegrityLab Control:** A mathematically sound baseline used to prove 0 false positives. AuditVector produced 0 findings, $0 discrepancy, and a **100/100 FIS (Grade A+)**.
+3. **AI-BIP Quantitative Engine:** Real-world production dogfooding independently proving a **$16,286.24 discrepancy**, representing **30.0484% erosion of reported $54,200.00 profit**, against canonical trade fills.
+
+The final codebase contains **63/63 automated tests passing**.
+
+AuditVector is deployed as a zero-cost public interactive demonstration on Google Firebase Hosting:  
+[https://auditvector-20610.web.app](https://auditvector-20610.web.app)
 
 ---
 
-## 📦 Tech Stack
+## Challenges we ran into
 
-* **AI & Agent Framework**: Google ADK 2.7, Gemini 3.5 Flash, Google GenAI SDK
-* **Verification & Math**: Python 3.12/3.14, DuckDB SQL Engine, Decimal FIFO Matcher
-* **Cloud Infrastructure**: Google Cloud Run, Google Cloud Pub/Sub, Google Cloud Firestore
-* **Backend API**: FastAPI, Pydantic, Uvicorn
-* **Frontend**: HTML5, CSS3 Cyber-Terminal Theme, Vanilla ES6 JavaScript
+The hardest challenge was not getting an LLM to explain financial problems — it was making the explanation provable and safe.
+
+### 1. The Proof Boundary
+If an LLM says *"the PnL looks suspicious,"* that cannot be sufficient for a financial audit. We created **Evidence Contracts** requiring deterministic verifier metadata, source-level citations, canonical transaction evidence, and SHA-256 data hashes for important claims.
+
+### 2. Safe Autonomous Remediation
+We wanted the agent to fix bugs without risking silent code corruption. We engineered an **Isolated Sandbox Verifier** that tests candidate patches against regression suites and deterministic financial reconcilers. The patch must pass verification and demonstrate that the financial discrepancy is reduced to $0.00 before it can be considered verified. The real repository remains protected by an explicit human authorization gate.
+
+### 3. Zero False Positives
+An auditing system that flags healthy code is useless. We designed the IntegrityLab Control benchmark and adaptive decision loop so the agent can recognize when the evidence is clean and autonomously bypass remediation:
+
+$$\text{0 findings} \longrightarrow \text{\$0 discrepancy} \longrightarrow \text{0 remediation actions} \longrightarrow \text{100/100 FIS}$$
+
+### 4. Exposing Agent Autonomy
+Rather than hiding agent behavior behind a final report, our UI exposes the six-agent pipeline, adaptive decisions, telemetry, interactive "WHY?" traversal, remediation verification, and full Audit Replay.
+
+---
+
+## Accomplishments that we're proud of
+
+* **4/4 financial contradictions detected and verified** in IntegrityLab Alpha
+* **$44,276.75 capital at risk** independently quantified in Alpha
+* **0 false positives** on the clean Control benchmark
+* **100/100 FIS — Grade A+** on Control
+* **4/4 remediation patches sandbox-verified**
+* **Alpha remediation reduced the verified discrepancy to $0.00**
+* **$16,286.24 discrepancy** independently proven on the real-world AI-BIP dogfood audit
+* **AI-BIP discrepancy represents 30.0484% erosion of reported $54,200.00 profit**
+* **63/63 automated tests passing**
+* **Evidence-driven adaptive ADK orchestration** that dynamically re-routes based on emerging evidence
+* **Interactive "WHY?" Evidence Traversal** connecting findings to verified transaction and source evidence
+* **Deterministic mathematical verification** independent of LLM arithmetic
+* **Human authorization gate** protecting real repository modifications
+* **Live zero-cost deployment** on Google Firebase Hosting
+
+---
+
+## What we learned
+
+### 1. Autonomy requires deterministic guardrails
+A high-stakes AI agent should have autonomy over what to investigate and what evidence to pursue, while critical mathematical conclusions and code modifications remain constrained by deterministic verifiers and sandbox safety boundaries.
+
+### 2. Evidence is part of the product
+A financial finding is only as useful as the evidence supporting it. AuditVector therefore treats provenance as a first-class product feature:
+
+$$\text{Source Code} \longrightarrow \text{Transaction Data} \longrightarrow \text{Deterministic Verifier} \longrightarrow \text{Evidence Contract} \longrightarrow \text{Remediation Sandbox} \longrightarrow \text{Verdict}$$
+
+### 3. Remediation is harder than detection
+Finding a bug is only half the problem. A trustworthy agent must demonstrate that its proposed fix actually resolves the underlying problem without introducing another one. The isolated remediation sandbox turns an AI-generated suggestion into a testable, independently verified change.
+
+### 4. Trust requires provable benchmarks
+Having both failure and clean control benchmarks was essential. The Alpha benchmark proves that AuditVector can aggressively discover real contradictions. The Control benchmark proves that it can also avoid inventing problems when the system is correct.
+
+---
+
+**AuditVector — AI reasons. Code proves. Evidence explains.**
